@@ -13,14 +13,12 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <Link to={`/tools/${tool.id}`} className="group block">
       <div className="overflow-hidden rounded-xl border bg-card shadow-card transition-shadow duration-200 hover:shadow-card-hover">
-        {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <img
             src={tool.images[0]}
             alt={tool.name}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          {/* Availability */}
           <span
             className={cn(
               "absolute left-3 top-3 rounded-full px-2 py-0.5 text-xs font-medium",
@@ -31,13 +29,11 @@ export function ToolCard({ tool }: ToolCardProps) {
           >
             {tool.available ? "Available" : "Unavailable"}
           </span>
-          {/* Category */}
           <span className="absolute right-3 top-3 rounded-full bg-card/90 px-2 py-0.5 text-xs font-medium text-card-foreground backdrop-blur-sm">
             {tool.subcategory || tool.category}
           </span>
         </div>
 
-        {/* Content */}
         <div className="p-4 space-y-2">
           <h3 className="font-semibold text-card-foreground line-clamp-1">{tool.name}</h3>
 
@@ -51,7 +47,10 @@ export function ToolCard({ tool }: ToolCardProps) {
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <StarRating score={tool.owner.trustScore} />
+            <div className="flex items-center gap-2">
+              <StarRating score={tool.owner.trustScore} />
+              <span className="text-xs font-semibold text-muted-foreground">{tool.owner.trustScore}/100</span>
+            </div>
             <TrustBadge score={tool.owner.trustScore} showLabel={false} />
           </div>
         </div>

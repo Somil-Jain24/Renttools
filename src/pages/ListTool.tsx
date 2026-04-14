@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { categories } from "@/lib/mockData";
-import { Upload, ImagePlus } from "lucide-react";
+import { Upload, ImagePlus, FileText } from "lucide-react";
 
 const ListTool = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [usageGuide, setUsageGuide] = useState("");
+  const [manualFile, setManualFile] = useState<File | null>(null);
 
   const subcategories = categories.find(c => c.name === selectedCategory)?.subcategories || [];
 
@@ -78,6 +79,44 @@ const ListTool = () => {
                   <input type="file" accept="image/*" className="hidden" />
                 </label>
               ))}
+            </div>
+          </div>
+
+          {/* Usage Guide Section */}
+          <div className="space-y-3 rounded-xl border bg-card p-5">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              <label className="text-sm font-semibold">Usage Guide / Instruction Manual</label>
+            </div>
+            <p className="text-xs text-muted-foreground">Help borrowers use your tool safely. Add step-by-step instructions or upload a manual (PDF).</p>
+            
+            <Textarea
+              placeholder={"e.g.\n1. Insert the correct drill bit\n2. Set the torque to medium\n3. Hold firmly with both hands\n4. Start at slow speed\n5. Wear safety goggles"}
+              rows={6}
+              value={usageGuide}
+              onChange={e => setUsageGuide(e.target.value)}
+            />
+
+            <div className="flex items-center gap-3">
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm hover:bg-muted transition-colors">
+                <Upload className="h-4 w-4 text-muted-foreground" />
+                <span>{manualFile ? manualFile.name : "Upload PDF Manual"}</span>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  className="hidden"
+                  onChange={e => setManualFile(e.target.files?.[0] || null)}
+                />
+              </label>
+              {manualFile && (
+                <button
+                  type="button"
+                  onClick={() => setManualFile(null)}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Remove
+                </button>
+              )}
             </div>
           </div>
 
