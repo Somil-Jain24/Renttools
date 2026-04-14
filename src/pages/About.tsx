@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Recycle, Users, Shield, Heart } from "lucide-react";
+import { Recycle, Users, Shield, Heart, Mail, Phone, MapPin } from "lucide-react";
 
 const values = [
   { icon: Recycle, title: "Reduce Waste", desc: "Why buy a tool you'll use once? Borrow it instead and reduce unnecessary consumption." },
@@ -42,6 +42,34 @@ const About = () => {
                 <p className="text-sm font-medium">{step}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Contact Section */}
+        <div className="mt-14 rounded-2xl border bg-card p-8">
+          <h2 className="text-xl font-bold mb-6 text-center">Contact Us</h2>
+          <div className="grid gap-6 sm:grid-cols-3">
+            <div className="flex flex-col items-center text-center space-y-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Mail className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-sm font-medium">Email</p>
+              <a href="mailto:support@rentkart.in" className="text-sm text-primary hover:underline">support@rentkart.in</a>
+            </div>
+            <div className="flex flex-col items-center text-center space-y-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Phone className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-sm font-medium">Phone</p>
+              <a href="tel:+918001234567" className="text-sm text-primary hover:underline">+91 800-123-4567</a>
+            </div>
+            <div className="flex flex-col items-center text-center space-y-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <MapPin className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-sm font-medium">Address</p>
+              <p className="text-sm text-muted-foreground">Koramangala, Bangalore, India 560034</p>
+            </div>
           </div>
         </div>
       </div>
