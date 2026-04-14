@@ -13,6 +13,8 @@ import { Login, Signup, OtpVerification } from "./pages/Auth";
 import About from "./pages/About";
 import Verification from "./pages/Verification";
 import DamageCheck from "./pages/DamageCheck";
+import HowItWorks from "./pages/HowItWorks";
+import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/signup" element={<Signup />} />
           <Route path="/otp" element={<OtpVerification />} />
           <Route path="/about" element={<About />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/verification" element={<Verification />} />
           <Route path="/damage-check" element={<DamageCheck />} />
           <Route path="*" element={<NotFound />} />
