@@ -6,12 +6,13 @@ import { TrustBadge } from "@/components/TrustBadge";
 import { StarRating } from "@/components/StarRating";
 import { Button } from "@/components/ui/button";
 import { tools } from "@/lib/mockData";
-import { MapPin, User, Shield, Calendar, ArrowLeft } from "lucide-react";
+import { MapPin, User, Shield, ArrowLeft, FileText, Download } from "lucide-react";
 
 const ToolDetails = () => {
   const { id } = useParams();
   const tool = tools.find(t => t.id === id);
   const [days, setDays] = useState(1);
+  const [showGuide, setShowGuide] = useState(false);
 
   if (!tool) {
     return (
@@ -26,6 +27,17 @@ const ToolDetails = () => {
   }
 
   const totalPrice = tool.pricePerDay * days;
+
+  const handleDownloadGuide = () => {
+    if (!tool.usageGuide) return;
+    const blob = new Blob([`Usage Guide: ${tool.name}\n${"=".repeat(40)}\n\n${tool.usageGuide}`], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${tool.name.replace(/\s+/g, "_")}_Usage_Guide.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -64,11 +76,14 @@ const ToolDetails = () => {
                 </div>
                 <div>
                   <p className="font-medium text-sm">{tool.owner.name}</p>
-                  <StarRating score={tool.owner.trustScore} showScore />
+                  <div className="flex items-center gap-2">
+                    <StarRating score={tool.owner.trustScore} showScore />
+                    <span className="text-xs text-muted-foreground">{tool.owner.trustScore}/100</span>
+                  </div>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <TrustBadge score={tool.owner.trustScore} />
+                <TrustBadge score={tool.owner.trustScore} showScore />
                 {tool.owner.idVerified && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-2 py-0.5 text-xs font-medium">
                     <Shield className="h-3 w-3" /> ID Verified
@@ -76,6 +91,30 @@ const ToolDetails = () => {
                 )}
               </div>
             </div>
+
+            {/* Usage Guide */}
+            {tool.usageGuide && (
+              <div className="rounded-xl border bg-card p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" /> Usage Guide
+                  </h3>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowGuide(!showGuide)}>
+                      {showGuide ? "Hide" : "View"}
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-xs h-7" onClick={handleDownloadGuide}>
+                      <Download className="h-3 w-3 mr-1" /> Download
+                    </Button>
+                  </div>
+                </div>
+                {showGuide && (
+                  <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground whitespace-pre-line">
+                    {tool.usageGuide}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Rental section */}
             <div className="rounded-xl border bg-card p-4 space-y-4">
