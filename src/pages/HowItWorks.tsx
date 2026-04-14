@@ -85,7 +85,7 @@ const HowItWorks = () => {
                   </div>
                   <div className="flex items-center gap-1 mt-4">
                     {[1,2,3,4,5].map(i => (
-                      <div key={i} className="h-4 w-4 rounded-full bg-primary" />
+                      <div key={i} className="h-4 w-4 rounded-full bg-amber-400" />
                     ))}
                     <span className="text-sm text-muted-foreground ml-2">5.0 (42 rentals)</span>
                   </div>

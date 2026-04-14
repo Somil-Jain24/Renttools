@@ -41,15 +41,20 @@ const Index = () => {
       {/* Categories */}
       <section className="container mx-auto px-4 py-14">
         <h2 className="text-2xl font-bold text-foreground mb-6">Browse Categories</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-8">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-4">
           {categories.map((cat) => (
             <Link
               key={cat.name}
               to={`/browse?category=${encodeURIComponent(cat.name)}`}
-              className="flex flex-col items-center gap-2 rounded-xl border bg-card p-4 text-center transition-colors hover:border-primary/30 hover:bg-primary/5"
+              className="group relative overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-card-hover"
             >
-              <span className="text-2xl">{cat.icon}</span>
-              <span className="text-xs font-medium text-card-foreground">{cat.name}</span>
+              <div className="aspect-[3/2] overflow-hidden">
+                <img src={cat.image} alt={cat.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              </div>
+              <div className="p-3 text-center">
+                <span className="text-lg mr-1">{cat.icon}</span>
+                <span className="text-sm font-medium text-card-foreground">{cat.name}</span>
+              </div>
             </Link>
           ))}
         </div>
