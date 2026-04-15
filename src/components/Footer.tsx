@@ -16,27 +16,27 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">Rent tools from neighbors. Save money, reduce waste.</p>
           </div>
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Platform</h4>
+            <h4 className="font-semibold mb-3 text-sm">Explore</h4>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <Link to="/browse" className="block hover:text-foreground">Browse Tools</Link>
-              <Link to="/list-tool" className="block hover:text-foreground">List a Tool</Link>
+              <Link to="/how-it-works" className="block hover:text-foreground">How It Works</Link>
               <Link to="/about" className="block hover:text-foreground">About Us</Link>
+              <Link to="/faq" className="block hover:text-foreground">FAQ</Link>
             </div>
           </div>
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Account</h4>
+            <h4 className="font-semibold mb-3 text-sm">Legal</h4>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <Link to="/dashboard" className="block hover:text-foreground">Dashboard</Link>
-              <Link to="/verification" className="block hover:text-foreground">Verification</Link>
-              <Link to="/login" className="block hover:text-foreground">Login</Link>
+              <p className="cursor-pointer hover:text-foreground">Privacy Policy</p>
+              <p className="cursor-pointer hover:text-foreground">Terms of Service</p>
+              <p className="cursor-pointer hover:text-foreground">Refund Policy</p>
             </div>
           </div>
           <div>
-            <h4 className="font-semibold mb-3 text-sm">Trust & Safety</h4>
+            <h4 className="font-semibold mb-3 text-sm">Contact</h4>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Verified users only</p>
-              <p>Escrow-protected deposits</p>
-              <p>Damage check system</p>
+              <p>support@rentkart.com</p>
+              <p>+91 98765 43210</p>
+              <p>Bengaluru, India</p>
             </div>
           </div>
         </div>
