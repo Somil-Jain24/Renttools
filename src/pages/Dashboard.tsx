@@ -3,18 +3,15 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { RentalStatusBadge, DepositStatusBadge } from "@/components/StatusBadge";
-import { TrustBadge } from "@/components/TrustBadge";
-import { StarRating } from "@/components/StarRating";
 import { BorrowerProfileDialog } from "@/components/BorrowerProfileDialog";
 import { RentalChat } from "@/components/RentalChat";
 import { myRentals, myListings, type Rental, type RentalStatus } from "@/lib/mockData";
-import { Package, List, Bell, User, Shield, Phone, CheckCircle } from "lucide-react";
+import { Package, List, Bell } from "lucide-react";
 
 const tabs = [
   { id: "rentals", label: "My Rentals", icon: Package },
   { id: "listings", label: "My Listings", icon: List },
   { id: "requests", label: "Requests", icon: Bell },
-  { id: "profile", label: "Profile", icon: User },
 ] as const;
 
 type Tab = typeof tabs[number]["id"];
@@ -62,81 +59,6 @@ function RentalItem({ rental, isOwner }: { rental: Rental; isOwner: boolean }) {
   );
 }
 
-function ProfileTab() {
-  const mockUser = {
-    name: "You (Demo User)",
-    email: "demo@rentkart.com",
-    phone: "+91 98765 43210",
-    trustScore: 85,
-    verified: true,
-    phoneVerified: true,
-    idVerified: true,
-    memberSince: "Jan 2025",
-    totalRentals: 15,
-    totalListings: 4,
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-          <User className="h-8 w-8 text-muted-foreground" />
-        </div>
-        <div>
-          <p className="text-lg font-semibold">{mockUser.name}</p>
-          <p className="text-sm text-muted-foreground">{mockUser.email}</p>
-          <div className="flex items-center gap-2 mt-1">
-            <TrustBadge score={mockUser.trustScore} showScore />
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-xl border bg-card p-4 space-y-3">
-        <h3 className="text-sm font-semibold">Trust Score</h3>
-        <div className="flex items-center gap-3">
-          <div className="text-3xl font-bold text-primary">{mockUser.trustScore}</div>
-          <div className="text-sm text-muted-foreground">/100</div>
-        </div>
-        <StarRating score={mockUser.trustScore} showScore />
-        <div className="w-full bg-muted rounded-full h-2">
-          <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${mockUser.trustScore}%` }} />
-        </div>
-      </div>
-
-      <div className="rounded-xl border bg-card p-4 space-y-3">
-        <h3 className="text-sm font-semibold">Verification</h3>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm">
-            <Phone className={`h-4 w-4 ${mockUser.phoneVerified ? 'text-success' : 'text-muted-foreground'}`} />
-            <span>Phone: {mockUser.phoneVerified ? 'Verified ✓' : 'Not Verified'}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Shield className={`h-4 w-4 ${mockUser.idVerified ? 'text-success' : 'text-muted-foreground'}`} />
-            <span>ID: {mockUser.idVerified ? 'Verified ✓' : 'Not Verified'}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <CheckCircle className={`h-4 w-4 ${mockUser.verified ? 'text-success' : 'text-muted-foreground'}`} />
-            <span>Email: {mockUser.verified ? 'Verified ✓' : 'Not Verified'}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl border bg-card p-4 text-center">
-          <p className="text-2xl font-bold">{mockUser.totalRentals}</p>
-          <p className="text-xs text-muted-foreground">Total Rentals</p>
-        </div>
-        <div className="rounded-xl border bg-card p-4 text-center">
-          <p className="text-2xl font-bold">{mockUser.totalListings}</p>
-          <p className="text-xs text-muted-foreground">Active Listings</p>
-        </div>
-      </div>
-
-      <p className="text-xs text-muted-foreground">Member since {mockUser.memberSince}</p>
-    </div>
-  );
-}
-
 const Dashboard = () => {
   const [tab, setTab] = useState<Tab>("rentals");
   const requests = myListings.filter(r => r.status === "REQUESTED");
@@ -169,7 +91,6 @@ const Dashboard = () => {
           {tab === "requests" && (requests.length ? requests.map(r => <RentalItem key={r.id} rental={r} isOwner={true} />) : (
             <p className="text-center py-12 text-muted-foreground">No pending requests</p>
           ))}
-          {tab === "profile" && <ProfileTab />}
         </div>
       </div>
       <Footer />

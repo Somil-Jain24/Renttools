@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Menu, X, User, Wrench } from "lucide-react";
+import { Search, Menu, X, User, Wrench, ChevronDown, LayoutDashboard, Shield, UserCircle, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,17 +44,44 @@ export function Navbar() {
           <Link to="/faq">
             <Button variant="ghost" size="sm">FAQ</Button>
           </Link>
-          <Link to="/login">
-            <Button variant="ghost" size="sm">Login</Button>
+          <Link to="/register">
+            <Button size="sm">Register</Button>
           </Link>
-          <Link to="/signup">
-            <Button size="sm">Sign Up</Button>
-          </Link>
-          <Link to="/dashboard" className="flex items-center gap-2 ml-1">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-              <User className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </Link>
+
+          {/* My Account Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1 ml-1 rounded-full bg-muted px-2 py-1.5 hover:bg-muted/80 transition-colors">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
+                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem asChild>
+                <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
+                  <UserCircle className="h-4 w-4" /> My Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/dashboard" className="flex items-center gap-2 cursor-pointer">
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/verification" className="flex items-center gap-2 cursor-pointer">
+                  <Shield className="h-4 w-4" /> Verification
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/account" className="flex items-center gap-2 cursor-pointer">
+                  <Settings className="h-4 w-4" /> My Account
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
@@ -66,10 +100,15 @@ export function Navbar() {
           <Link to="/how-it-works" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">How It Works</Link>
           <Link to="/about" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">About Us</Link>
           <Link to="/faq" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">FAQ</Link>
-          <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">Dashboard</Link>
-          <Link to="/login" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">Login</Link>
-          <Link to="/signup" onClick={() => setMenuOpen(false)}>
-            <Button className="w-full" size="sm">Sign Up</Button>
+          <div className="border-t pt-2 mt-2">
+            <p className="text-xs text-muted-foreground mb-2">Account</p>
+            <Link to="/profile" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">My Profile</Link>
+            <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">Dashboard</Link>
+            <Link to="/verification" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">Verification</Link>
+            <Link to="/account" onClick={() => setMenuOpen(false)} className="block py-2 text-sm font-medium">My Account</Link>
+          </div>
+          <Link to="/register" onClick={() => setMenuOpen(false)}>
+            <Button className="w-full" size="sm">Register</Button>
           </Link>
         </div>
       )}
