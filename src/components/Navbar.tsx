@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X, User, Wrench, ChevronDown, LayoutDashboard, Shield, UserCircle, Settings, LogOut, Moon, Sun } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Search, Menu, X, User, Wrench, ChevronDown, LayoutDashboard, Shield, UserCircle, Settings, LogOut, Moon, Sun, ShoppingBag, Plus, BarChart3, DollarSign, Bell, Heart, BookOpen, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -14,9 +14,43 @@ import {
 
 export function Navbar() {
   const navigate = useNavigate();
-  const { currentUser, logout } = useUser();
+  const location = useLocation();
+  const { currentUser, logout, switchMode } = useUser();
   const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Get navbar items based on current mode
+  const getNavItems = () => {
+    if (!currentUser) {
+      return [
+        { label: "Browse", href: "/browse", icon: ShoppingBag },
+        { label: "How it works", href: "/how-it-works", icon: BookOpen },
+        { label: "About", href: "/about", icon: UserCircle },
+      ];
+    }
+
+    if (currentUser.mode === "buyer") {
+      return [
+        { label: "Browse", href: "/browse", icon: ShoppingBag },
+        { label: "My Rentals", href: "/my-rentals", icon: Package },
+        { label: "My Orders", href: "/my-orders", icon: LayoutDashboard },
+        { label: "Requests", href: "/requests", icon: Bell },
+        { label: "Wishlist", href: "/wishlist", icon: Heart },
+      ];
+    } else {
+      // Seller mode
+      return [
+        { label: "Dashboard", href: "/seller-dashboard", icon: LayoutDashboard },
+        { label: "My Listings", href: "/my-listings", icon: ShoppingBag },
+        { label: "Requests", href: "/requests", icon: Bell },
+        { label: "Earnings", href: "/earnings", icon: DollarSign },
+        { label: "Analytics", href: "/analytics", icon: BarChart3 },
+        { label: "List Tool", href: "/list-tool", icon: Plus },
+      ];
+    }
+  };
+
+  const navItems = getNavItems();
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/60 bg-card/70 backdrop-blur-xl shadow-navbar">
@@ -34,15 +68,20 @@ export function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-0.5">
-          <Link to="/browse">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors">Browse</Button>
-          </Link>
-          <Link to="/list-tool">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors">List a Tool</Button>
-          </Link>
-          <Link to="/about">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors">About Us</Button>
-          </Link>
+          {navItems.map((item) => (
+            <Link key={item.href} to={item.href}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors ${
+                  location.pathname === item.href ? 'text-foreground bg-secondary/80' : ''
+                }`}
+              >
+                <item.icon className="h-4 w-4 mr-1" />
+                <span className="hidden lg:inline">{item.label}</span>
+              </Button>
+            </Link>
+          ))}
 
           <Button
             variant="ghost"
@@ -68,26 +107,52 @@ export function Navbar() {
                   <ChevronDown className="h-3 w-3 text-muted-foreground" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 shadow-elevated-lg border-border/60 rounded-xl p-1">
+              <DropdownMenuContent align="end" className="w-56 shadow-elevated-lg border-border/60 rounded-xl p-1">
+                <div className="px-3 py-2 border-b border-border/60">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">ACCOUNT</p>
+                </div>
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2.5 cursor-pointer rounded-lg px-3 py-2">
                     <UserCircle className="h-4 w-4 text-muted-foreground" /> My Profile
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="flex items-center gap-2.5 cursor-pointer rounded-lg px-3 py-2">
-                    <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> Dashboard
-                  </Link>
-                </DropdownMenuItem>
+
+                {currentUser.isSeller && (
+                  <>
+                    <DropdownMenuSeparator className="my-1" />
+                    <div className="px-3 py-2">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">MODE</p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant={currentUser.mode === "buyer" ? "default" : "outline"}
+                          className="flex-1 text-xs"
+                          onClick={() => switchMode("buyer")}
+                        >
+                          Buyer
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={currentUser.mode === "seller" ? "default" : "outline"}
+                          className="flex-1 text-xs"
+                          onClick={() => switchMode("seller")}
+                        >
+                          Seller
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <DropdownMenuSeparator className="my-1" />
                 <DropdownMenuItem asChild>
                   <Link to="/verification" className="flex items-center gap-2.5 cursor-pointer rounded-lg px-3 py-2">
                     <Shield className="h-4 w-4 text-muted-foreground" /> Verification
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="my-1" />
                 <DropdownMenuItem asChild>
                   <Link to="/account" className="flex items-center gap-2.5 cursor-pointer rounded-lg px-3 py-2">
-                    <Settings className="h-4 w-4 text-muted-foreground" /> My Account
+                    <Settings className="h-4 w-4 text-muted-foreground" /> Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1" />
@@ -95,6 +160,7 @@ export function Navbar() {
                   onClick={() => {
                     logout();
                     navigate("/");
+                    setMenuOpen(false);
                   }}
                   className="flex items-center gap-2.5 cursor-pointer rounded-lg px-3 py-2 text-red-600 hover:bg-red-50"
                 >
@@ -125,18 +191,61 @@ export function Navbar() {
             <Search className="h-4 w-4 text-muted-foreground" />
             <input placeholder="Search tools..." className="bg-transparent outline-none w-full placeholder:text-muted-foreground" />
           </div>
-          <Link to="/browse" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">Browse Tools</Link>
-          <Link to="/list-tool" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">List a Tool</Link>
-          <Link to="/about" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">About Us</Link>
+
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              onClick={() => setMenuOpen(false)}
+              className={`flex items-center gap-2 py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors ${
+                location.pathname === item.href ? 'bg-secondary text-foreground' : ''
+              }`}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+            </Link>
+          ))}
 
           {currentUser && (
             <>
               <div className="border-t border-border/60 pt-3 mt-3">
-                <p className="text-xs text-muted-foreground mb-2 px-3 font-medium uppercase tracking-wider">Account</p>
+                <p className="text-xs text-muted-foreground mb-3 px-3 font-medium uppercase tracking-wider">Account</p>
                 <Link to="/profile" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">My Profile</Link>
-                <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">Dashboard</Link>
-                <Link to="/verification" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">Verification</Link>
-                <Link to="/account" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">My Account</Link>
+
+                {currentUser.isSeller && (
+                  <>
+                    <div className="mt-2 pt-2 border-t border-border/60">
+                      <p className="text-xs text-muted-foreground mb-2 px-3 font-medium uppercase tracking-wider">Mode</p>
+                      <div className="flex gap-2 px-3">
+                        <Button
+                          size="sm"
+                          variant={currentUser.mode === "buyer" ? "default" : "outline"}
+                          className="flex-1 text-xs"
+                          onClick={() => {
+                            switchMode("buyer");
+                            setMenuOpen(false);
+                          }}
+                        >
+                          Buyer
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={currentUser.mode === "seller" ? "default" : "outline"}
+                          className="flex-1 text-xs"
+                          onClick={() => {
+                            switchMode("seller");
+                            setMenuOpen(false);
+                          }}
+                        >
+                          Seller
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <Link to="/verification" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors mt-2">Verification</Link>
+                <Link to="/account" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors">Settings</Link>
               </div>
               <button
                 onClick={() => {
