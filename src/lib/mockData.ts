@@ -22,6 +22,7 @@ export interface ToolOwner {
   verified: boolean;
   phoneVerified: boolean;
   idVerified: boolean;
+  isSeller: boolean;
   totalRentals?: number;
   completedRentals?: number;
   damageReports?: number;
@@ -98,15 +99,15 @@ export const categories = [
 ];
 
 const owners: ToolOwner[] = [
-  { id: "u1", name: "Rahul Sharma", avatar: "", trustScore: 92, verified: true, phoneVerified: true, idVerified: true, totalRentals: 34, completedRentals: 32, damageReports: 0, memberSince: "Jan 2025" },
-  { id: "u2", name: "Priya Patel", avatar: "", trustScore: 78, verified: true, phoneVerified: true, idVerified: false, totalRentals: 18, completedRentals: 16, damageReports: 1, memberSince: "Mar 2025" },
-  { id: "u3", name: "Amit Singh", avatar: "", trustScore: 55, verified: false, phoneVerified: true, idVerified: false, totalRentals: 8, completedRentals: 6, damageReports: 2, memberSince: "Sep 2025" },
-  { id: "u4", name: "Sneha Reddy", avatar: "", trustScore: 88, verified: true, phoneVerified: true, idVerified: true, totalRentals: 25, completedRentals: 24, damageReports: 0, memberSince: "Feb 2025" },
+  { id: "u1", name: "Rahul Sharma", avatar: "", trustScore: 92, verified: true, phoneVerified: true, idVerified: true, isSeller: true, totalRentals: 34, completedRentals: 32, damageReports: 0, memberSince: "Jan 2025" },
+  { id: "u2", name: "Priya Patel", avatar: "", trustScore: 78, verified: true, phoneVerified: true, idVerified: false, isSeller: true, totalRentals: 18, completedRentals: 16, damageReports: 1, memberSince: "Mar 2025" },
+  { id: "u3", name: "Amit Singh", avatar: "", trustScore: 55, verified: false, phoneVerified: true, idVerified: false, isSeller: true, totalRentals: 8, completedRentals: 6, damageReports: 2, memberSince: "Sep 2025" },
+  { id: "u4", name: "Sneha Reddy", avatar: "", trustScore: 88, verified: true, phoneVerified: true, idVerified: true, isSeller: true, totalRentals: 25, completedRentals: 24, damageReports: 0, memberSince: "Feb 2025" },
 ];
 
 const borrowers: ToolOwner[] = [
-  { id: "b1", name: "Vikram Joshi", avatar: "", trustScore: 72, verified: true, phoneVerified: true, idVerified: true, totalRentals: 12, completedRentals: 11, damageReports: 1, memberSince: "Apr 2025" },
-  { id: "b2", name: "Ananya Gupta", avatar: "", trustScore: 45, verified: false, phoneVerified: true, idVerified: false, totalRentals: 3, completedRentals: 2, damageReports: 1, memberSince: "Dec 2025" },
+  { id: "b1", name: "Vikram Joshi", avatar: "", trustScore: 72, verified: true, phoneVerified: true, idVerified: true, isSeller: false, totalRentals: 12, completedRentals: 11, damageReports: 1, memberSince: "Apr 2025" },
+  { id: "b2", name: "Ananya Gupta", avatar: "", trustScore: 45, verified: false, phoneVerified: true, idVerified: false, isSeller: false, totalRentals: 3, completedRentals: 2, damageReports: 1, memberSince: "Dec 2025" },
 ];
 
 export const tools: Tool[] = [
