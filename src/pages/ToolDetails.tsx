@@ -7,13 +7,15 @@ import { StarRating } from "@/components/StarRating";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { tools, negotiatedOffers } from "@/lib/mockData";
-import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap } from "lucide-react";
+import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { createOffer } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const ToolDetails = () => {
   const navigate = useNavigate();
   const { currentUser } = useUser();
+  const { toast } = useToast();
   const { id } = useParams();
   const tool = tools.find(t => t.id === id);
   const [days, setDays] = useState(1);
@@ -231,8 +233,11 @@ const ToolDetails = () => {
                   if (!currentUser) {
                     navigate("/signup");
                   } else {
-                    // Handle rental request
-                    alert("Rental request submitted!");
+                    // Show success toast
+                    toast({
+                      title: "Request Sent Successfully!",
+                      description: "Your rental request has been sent to the owner. They will review it within 2 hours.",
+                    });
                   }
                 }}
               >

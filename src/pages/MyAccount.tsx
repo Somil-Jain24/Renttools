@@ -3,8 +3,11 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { User, Mail, Phone, MapPin, Bell, Shield, LogOut } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 const MyAccount = () => {
+  const { currentUser, switchRole } = useUser();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -12,6 +15,38 @@ const MyAccount = () => {
         <h1 className="text-2xl font-bold mb-6">My Account</h1>
 
         <div className="space-y-6">
+          {/* Account Type / Role Switcher */}
+          <div className="rounded-xl border bg-card p-5 space-y-3">
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <Shield className="h-4 w-4" /> Account Type
+            </h3>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => switchRole("buyer")}
+                variant={currentUser?.role === "buyer" ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+              >
+                👤 Buyer
+              </Button>
+              <Button
+                onClick={() => switchRole("seller")}
+                variant={currentUser?.role === "seller" ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+              >
+                🏪 Seller
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {currentUser?.role === "seller" ? (
+                <>You can list and rent items. Visit your listings to get started!</>
+              ) : (
+                <>Switch to Seller to list and rent items</>
+              )}
+            </p>
+          </div>
+
           {/* Personal Info */}
           <div className="rounded-xl border bg-card p-5 space-y-4">
             <h3 className="text-sm font-semibold">Personal Information</h3>
@@ -41,7 +76,7 @@ const MyAccount = () => {
                 <label className="text-xs text-muted-foreground">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input className="pl-10" defaultValue="Bengaluru, India" />
+                  <Input className="pl-10" defaultValue="Indore, India" />
                 </div>
               </div>
             </div>
