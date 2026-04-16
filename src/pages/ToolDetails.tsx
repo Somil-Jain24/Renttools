@@ -5,9 +5,11 @@ import { Footer } from "@/components/Footer";
 import { TrustBadge } from "@/components/TrustBadge";
 import { StarRating } from "@/components/StarRating";
 import { Button } from "@/components/ui/button";
-import { tools } from "@/lib/mockData";
-import { MapPin, User, Shield, ArrowLeft, FileText, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { tools, negotiatedOffers } from "@/lib/mockData";
+import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { createOffer } from "@/lib/utils";
 
 const ToolDetails = () => {
   const navigate = useNavigate();
@@ -16,6 +18,9 @@ const ToolDetails = () => {
   const tool = tools.find(t => t.id === id);
   const [days, setDays] = useState(1);
   const [showGuide, setShowGuide] = useState(false);
+  const [showOfferInput, setShowOfferInput] = useState(false);
+  const [offerPrice, setOfferPrice] = useState("");
+  const [offers, setOffers] = useState(negotiatedOffers);
 
   if (!tool) {
     return (
@@ -30,6 +35,8 @@ const ToolDetails = () => {
   }
 
   const totalPrice = tool.pricePerDay * days;
+  const today = new Date().toISOString().split("T")[0];
+  const endDate = new Date(new Date().setDate(new Date().getDate() + days)).toISOString().split("T")[0];
 
   const handleDownloadGuide = () => {
     if (!tool.usageGuide) return;
@@ -40,6 +47,30 @@ const ToolDetails = () => {
     a.download = `${tool.name.replace(/\s+/g, "_")}_Usage_Guide.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleSubmitOffer = () => {
+    if (!offerPrice || Number(offerPrice) <= 0) {
+      alert("Please enter a valid price");
+      return;
+    }
+
+    if (!currentUser || !tool) return;
+
+    const newOffer = createOffer(
+      tool.id,
+      currentUser.id,
+      tool.owner.id,
+      Number(offerPrice),
+      totalPrice,
+      today,
+      endDate
+    );
+
+    setOffers([...offers, newOffer]);
+    setOfferPrice("");
+    setShowOfferInput(false);
+    alert("Offer sent to the owner! They will review it within 2 hours.");
   };
 
   return (
@@ -135,6 +166,63 @@ const ToolDetails = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">Security deposit</span><span className="font-medium">₹{tool.deposit}</span></div>
                 <div className="border-t pt-2 flex justify-between font-semibold"><span>Total</span><span className="text-primary">₹{totalPrice + tool.deposit}</span></div>
               </div>
+
+              {/* Negotiated Offer Section */}
+              {currentUser && !currentUser.isSeller && (
+                <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-sm font-medium text-blue-900 dark:text-blue-100">Make an Offer</span>
+                  </div>
+                  {!showOfferInput ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setShowOfferInput(true)}
+                    >
+                      Negotiate Price
+                    </Button>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-blue-800 dark:text-blue-200">Your offer price (₹)</label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          placeholder={String(totalPrice - 50)}
+                          value={offerPrice}
+                          onChange={(e) => setOfferPrice(e.target.value)}
+                          className="h-8 text-sm"
+                          min={1}
+                          max={totalPrice}
+                        />
+                      </div>
+                      <p className="text-xs text-blue-600 dark:text-blue-300">Original: ₹{totalPrice} | Min: ₹{Math.floor(totalPrice * 0.7)}</p>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          className="h-8 text-xs flex-1"
+                          onClick={handleSubmitOffer}
+                        >
+                          Send Offer
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs flex-1"
+                          onClick={() => {
+                            setShowOfferInput(false);
+                            setOfferPrice("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <Button
                 className="w-full"
                 size="lg"

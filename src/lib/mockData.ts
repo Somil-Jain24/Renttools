@@ -34,6 +34,7 @@ export type DepositStatus = "LOCKED" | "DEDUCTED" | "RELEASED";
 export type VerificationStatus = "NOT_VERIFIED" | "SUBMITTED" | "VERIFIED";
 export type DamageLevel = "NONE" | "MINOR" | "MAJOR";
 export type TrustLevel = "basic" | "verified" | "trusted";
+export type OfferStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED" | "CONFIRMED";
 
 export interface ChatMessage {
   id: string;
@@ -53,6 +54,21 @@ export interface Rental {
   totalPrice: number;
   borrower?: ToolOwner;
   chatMessages?: ChatMessage[];
+}
+
+export interface NegotiatedOffer {
+  id: string;
+  toolId: string;
+  customerId: string;
+  ownerId: string;
+  proposedPrice: number;
+  originalPrice: number;
+  status: OfferStatus;
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  expiresAt: string;
+  confirmedAt?: string;
 }
 
 export const categories = [
@@ -98,14 +114,14 @@ export const categories = [
   },
 ];
 
-const owners: ToolOwner[] = [
+export const owners: ToolOwner[] = [
   { id: "u1", name: "Rahul Sharma", avatar: "", trustScore: 92, verified: true, phoneVerified: true, idVerified: true, isSeller: true, totalRentals: 34, completedRentals: 32, damageReports: 0, memberSince: "Jan 2025" },
   { id: "u2", name: "Priya Patel", avatar: "", trustScore: 78, verified: true, phoneVerified: true, idVerified: false, isSeller: true, totalRentals: 18, completedRentals: 16, damageReports: 1, memberSince: "Mar 2025" },
   { id: "u3", name: "Amit Singh", avatar: "", trustScore: 55, verified: false, phoneVerified: true, idVerified: false, isSeller: true, totalRentals: 8, completedRentals: 6, damageReports: 2, memberSince: "Sep 2025" },
   { id: "u4", name: "Sneha Reddy", avatar: "", trustScore: 88, verified: true, phoneVerified: true, idVerified: true, isSeller: true, totalRentals: 25, completedRentals: 24, damageReports: 0, memberSince: "Feb 2025" },
 ];
 
-const borrowers: ToolOwner[] = [
+export const borrowers: ToolOwner[] = [
   { id: "b1", name: "Vikram Joshi", avatar: "", trustScore: 72, verified: true, phoneVerified: true, idVerified: true, isSeller: false, totalRentals: 12, completedRentals: 11, damageReports: 1, memberSince: "Apr 2025" },
   { id: "b2", name: "Ananya Gupta", avatar: "", trustScore: 45, verified: false, phoneVerified: true, idVerified: false, isSeller: false, totalRentals: 3, completedRentals: 2, damageReports: 1, memberSince: "Dec 2025" },
 ];
@@ -217,6 +233,22 @@ export const myListings: Rental[] = [
     ],
   },
   { id: "l2", tool: tools[5], status: "REQUESTED", depositStatus: "LOCKED", startDate: "2026-04-16", endDate: "2026-04-18", totalPrice: 360, borrower: borrowers[1] },
+];
+
+export const negotiatedOffers: NegotiatedOffer[] = [
+  {
+    id: "o1",
+    toolId: "t1",
+    customerId: "b1",
+    ownerId: "u1",
+    proposedPrice: 120,
+    originalPrice: 150,
+    status: "PENDING",
+    startDate: "2026-04-20",
+    endDate: "2026-04-22",
+    createdAt: "2026-04-16 10:00",
+    expiresAt: "2026-04-16 12:00",
+  },
 ];
 
 export function getTrustLevel(score: number): TrustLevel {
