@@ -230,21 +230,19 @@ const ToolDetails = () => {
                 onClick={() => {
                   if (!currentUser) {
                     navigate("/signup");
-                  } else if (currentUser.isSeller) {
-                    alert("Sellers cannot rent tools. Switch to buyer account to rent.");
                   } else {
                     // Handle rental request
                     alert("Rental request submitted!");
                   }
                 }}
               >
-                {!currentUser ? "Login to Rent" : currentUser.isSeller ? "Sellers Cannot Rent" : tool.available ? "Request to Rent" : "Currently Unavailable"}
+                {!currentUser ? "Login to Rent" : tool.available ? "Request to Rent" : "Currently Unavailable"}
               </Button>
               {!currentUser && (
                 <p className="text-xs text-muted-foreground text-center">You must be logged in to rent tools</p>
               )}
               {currentUser?.isSeller && (
-                <p className="text-xs text-amber-600 text-center">Switch to a buyer account to rent tools</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 text-center">To list items for rent, switch to Renter Mode from your dashboard</p>
               )}
             </div>
 
