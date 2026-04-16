@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X, User, Wrench, ChevronDown, LayoutDashboard, Shield, UserCircle, Settings, LogOut } from "lucide-react";
+import { Search, Menu, X, User, Wrench, ChevronDown, LayoutDashboard, Shield, UserCircle, Settings, LogOut, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/UserContext";
+import { useTheme } from "@/context/ThemeContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +15,7 @@ import {
 export function Navbar() {
   const navigate = useNavigate();
   const { currentUser, logout } = useUser();
+  const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -41,6 +43,16 @@ export function Navbar() {
           <Link to="/about">
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors">About Us</Button>
           </Link>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleTheme}
+            className="text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors"
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </Button>
 
           {!currentUser ? (
             <Link to="/signup">
@@ -93,9 +105,18 @@ export function Navbar() {
           )}
         </div>
 
-        <button className="md:hidden p-2 rounded-xl hover:bg-secondary transition-colors" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl hover:bg-secondary transition-colors"
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          </button>
+          <button className="p-2 rounded-xl hover:bg-secondary transition-colors" onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {menuOpen && (

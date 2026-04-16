@@ -34,6 +34,7 @@ export type DepositStatus = "LOCKED" | "DEDUCTED" | "RELEASED";
 export type VerificationStatus = "NOT_VERIFIED" | "SUBMITTED" | "VERIFIED";
 export type DamageLevel = "NONE" | "MINOR" | "MAJOR";
 export type TrustLevel = "basic" | "verified" | "trusted";
+export type OfferStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED" | "CONFIRMED";
 
 export interface ChatMessage {
   id: string;
@@ -53,6 +54,21 @@ export interface Rental {
   totalPrice: number;
   borrower?: ToolOwner;
   chatMessages?: ChatMessage[];
+}
+
+export interface NegotiatedOffer {
+  id: string;
+  toolId: string;
+  customerId: string;
+  ownerId: string;
+  proposedPrice: number;
+  originalPrice: number;
+  status: OfferStatus;
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  expiresAt: string;
+  confirmedAt?: string;
 }
 
 export const categories = [
@@ -217,6 +233,22 @@ export const myListings: Rental[] = [
     ],
   },
   { id: "l2", tool: tools[5], status: "REQUESTED", depositStatus: "LOCKED", startDate: "2026-04-16", endDate: "2026-04-18", totalPrice: 360, borrower: borrowers[1] },
+];
+
+export const negotiatedOffers: NegotiatedOffer[] = [
+  {
+    id: "o1",
+    toolId: "t1",
+    customerId: "b1",
+    ownerId: "u1",
+    proposedPrice: 120,
+    originalPrice: 150,
+    status: "PENDING",
+    startDate: "2026-04-20",
+    endDate: "2026-04-22",
+    createdAt: "2026-04-16 10:00",
+    expiresAt: "2026-04-16 12:00",
+  },
 ];
 
 export function getTrustLevel(score: number): TrustLevel {
