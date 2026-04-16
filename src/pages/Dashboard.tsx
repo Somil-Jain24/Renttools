@@ -6,7 +6,7 @@ import { RentalStatusBadge, DepositStatusBadge } from "@/components/StatusBadge"
 import { BorrowerProfileDialog } from "@/components/BorrowerProfileDialog";
 import { RentalChat } from "@/components/RentalChat";
 import { myRentals, myListings, negotiatedOffers, tools, borrowers, type Rental, type RentalStatus, type NegotiatedOffer } from "@/lib/mockData";
-import { Package, List, Bell, Zap, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Package, List, Bell, Zap, CheckCircle, XCircle, Clock, Shield } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { getTimeRemaining, isOfferExpired } from "@/lib/utils";
 
@@ -114,11 +114,17 @@ function RentalItem({ rental, isOwner }: { rental: Rental; isOwner: boolean }) {
 }
 
 const Dashboard = () => {
-  const { currentUser } = useUser();
+  const { currentUser, switchRole } = useUser();
   const [tab, setTab] = useState<Tab>("rentals");
   const [offers, setOffers] = useState(negotiatedOffers);
   const [, setTimerTrigger] = useState(0); // For forcing re-renders to update timers
   const requests = myListings.filter(r => r.status === "REQUESTED");
+
+  const roles = [
+    { id: "buyer", label: "Buyer", icon: "👤" },
+    { id: "renter", label: "Renter", icon: "📦" },
+    { id: "seller", label: "Seller", icon: "🏪" },
+  ] as const;
 
   // Filter offers for the current user (owner)
   const myOffers = offers.filter(o => o.ownerId === currentUser?.id && o.status === "PENDING");
@@ -164,6 +170,34 @@ const Dashboard = () => {
       <Navbar />
       <div className="container mx-auto flex-1 px-4 py-8 max-w-3xl">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+
+        {/* Role Switcher */}
+        <div className="rounded-xl border bg-card p-4 mb-6">
+          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+            <Shield className="h-4 w-4" /> Your Current Role
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {roles.map(role => (
+              <Button
+                key={role.id}
+                onClick={() => switchRole(role.id as "buyer" | "seller" | "renter")}
+                variant={currentUser?.role === role.id ? "default" : "outline"}
+                size="sm"
+                className="text-sm"
+              >
+                <span className="mr-1">{role.icon}</span>
+                {role.label}
+              </Button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            {currentUser?.role === "renter" ? (
+              <>You can now list items for rent. Visit your listings to get started!</>
+            ) : (
+              <>Switch to Renter Mode to list items for rent</>
+            )}
+          </p>
+        </div>
 
         <div className="flex gap-1 rounded-xl bg-muted p-1 mb-6">
           {tabs.map(t => (

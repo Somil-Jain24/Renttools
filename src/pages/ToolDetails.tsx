@@ -168,7 +168,7 @@ const ToolDetails = () => {
               </div>
 
               {/* Negotiated Offer Section */}
-              {currentUser && !currentUser.isSeller && (
+              {currentUser && currentUser.role === "buyer" && (
                 <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 space-y-3">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -241,7 +241,7 @@ const ToolDetails = () => {
               {!currentUser && (
                 <p className="text-xs text-muted-foreground text-center">You must be logged in to rent tools</p>
               )}
-              {currentUser?.isSeller && (
+              {currentUser?.role !== "buyer" && (
                 <p className="text-xs text-blue-600 dark:text-blue-400 text-center">To list items for rent, switch to Renter Mode from your dashboard</p>
               )}
             </div>
