@@ -272,10 +272,10 @@ const ToolDetails = () => {
             </div>
             <DialogTitle className="text-center">Request Sent Successfully!</DialogTitle>
           </DialogHeader>
-          <DialogDescription className="text-center space-y-2">
-            <p>Your request has been sent to the owner.</p>
-            <p className="font-semibold text-foreground">The owner will review it within 2 hours.</p>
-          </DialogDescription>
+          <div className="text-center space-y-2 text-sm text-muted-foreground">
+            <div>Your request has been sent to the owner.</div>
+            <div className="font-semibold text-foreground">The owner will review it within 2 hours.</div>
+          </div>
           <Button
             onClick={() => setShowSuccessModal(false)}
             className="w-full mt-4"
