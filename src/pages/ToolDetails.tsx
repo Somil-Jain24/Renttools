@@ -6,14 +6,17 @@ import { TrustBadge } from "@/components/TrustBadge";
 import { StarRating } from "@/components/StarRating";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { tools, negotiatedOffers } from "@/lib/mockData";
-import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap } from "lucide-react";
+import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { createOffer } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const ToolDetails = () => {
   const navigate = useNavigate();
   const { currentUser } = useUser();
+  const { toast } = useToast();
   const { id } = useParams();
   const tool = tools.find(t => t.id === id);
   const [days, setDays] = useState(1);
@@ -21,6 +24,7 @@ const ToolDetails = () => {
   const [showOfferInput, setShowOfferInput] = useState(false);
   const [offerPrice, setOfferPrice] = useState("");
   const [offers, setOffers] = useState(negotiatedOffers);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   if (!tool) {
     return (
@@ -70,7 +74,7 @@ const ToolDetails = () => {
     setOffers([...offers, newOffer]);
     setOfferPrice("");
     setShowOfferInput(false);
-    alert("Offer sent to the owner! They will review it within 2 hours.");
+    setShowSuccessModal(true);
   };
 
   return (
@@ -168,7 +172,7 @@ const ToolDetails = () => {
               </div>
 
               {/* Negotiated Offer Section */}
-              {currentUser && !currentUser.isSeller && (
+              {currentUser && currentUser.role === "buyer" && (
                 <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 space-y-3">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -230,21 +234,18 @@ const ToolDetails = () => {
                 onClick={() => {
                   if (!currentUser) {
                     navigate("/signup");
-                  } else if (currentUser.isSeller) {
-                    alert("Sellers cannot rent tools. Switch to buyer account to rent.");
                   } else {
-                    // Handle rental request
-                    alert("Rental request submitted!");
+                    setShowSuccessModal(true);
                   }
                 }}
               >
-                {!currentUser ? "Login to Rent" : currentUser.isSeller ? "Sellers Cannot Rent" : tool.available ? "Request to Rent" : "Currently Unavailable"}
+                {!currentUser ? "Login to Rent" : tool.available ? "Request to Rent" : "Currently Unavailable"}
               </Button>
               {!currentUser && (
                 <p className="text-xs text-muted-foreground text-center">You must be logged in to rent tools</p>
               )}
-              {currentUser?.isSeller && (
-                <p className="text-xs text-amber-600 text-center">Switch to a buyer account to rent tools</p>
+              {currentUser?.role !== "buyer" && (
+                <p className="text-xs text-blue-600 dark:text-blue-400 text-center">To list items for rent, switch to Renter Mode from your dashboard</p>
               )}
             </div>
 
@@ -261,6 +262,28 @@ const ToolDetails = () => {
         </div>
       </div>
       <Footer />
+
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="items-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-950 mb-4">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <DialogTitle className="text-center">Request Sent Successfully!</DialogTitle>
+          </DialogHeader>
+          <div className="text-center space-y-2 text-sm text-muted-foreground">
+            <div>Your request has been sent to the owner.</div>
+            <div className="font-semibold text-foreground">The owner will review it within 2 hours.</div>
+          </div>
+          <Button
+            onClick={() => setShowSuccessModal(false)}
+            className="w-full mt-4"
+          >
+            Great, Thanks!
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

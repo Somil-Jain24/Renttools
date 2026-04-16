@@ -5,6 +5,7 @@ export interface CurrentUser {
   name: string;
   email: string;
   isSeller: boolean;
+  role: "buyer" | "seller";
 }
 
 interface UserContextType {
@@ -13,6 +14,7 @@ interface UserContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, phone: string, password: string, isSeller: boolean) => Promise<void>;
   logout: () => void;
+  switchRole: (newRole: "buyer" | "seller") => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -41,6 +43,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name: "Current User",
       email: email,
       isSeller: true, // Default to seller for existing users
+      role: "seller", // Default role
     };
     setCurrentUser(mockUser);
     localStorage.setItem("currentUser", JSON.stringify(mockUser));
@@ -53,6 +56,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name: name,
       email: email,
       isSeller: isSeller,
+      role: isSeller ? "seller" : "buyer",
     };
     setCurrentUser(newUser);
     localStorage.setItem("currentUser", JSON.stringify(newUser));
@@ -63,12 +67,25 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("currentUser");
   };
 
+  const switchRole = (newRole: "buyer" | "seller") => {
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        role: newRole,
+        isSeller: newRole === "seller",
+      };
+      setCurrentUser(updatedUser);
+      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    }
+  };
+
   const value: UserContextType = {
     currentUser,
     isLoading,
     login,
     signup,
     logout,
+    switchRole,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
