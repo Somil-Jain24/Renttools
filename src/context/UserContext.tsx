@@ -5,7 +5,7 @@ export interface CurrentUser {
   name: string;
   email: string;
   isSeller: boolean;
-  role: "buyer" | "seller" | "renter";
+  role: "buyer" | "seller";
 }
 
 interface UserContextType {
@@ -14,7 +14,7 @@ interface UserContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, phone: string, password: string, isSeller: boolean) => Promise<void>;
   logout: () => void;
-  switchRole: (newRole: "buyer" | "seller" | "renter") => void;
+  switchRole: (newRole: "buyer" | "seller") => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -67,12 +67,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("currentUser");
   };
 
-  const switchRole = (newRole: "buyer" | "seller" | "renter") => {
+  const switchRole = (newRole: "buyer" | "seller") => {
     if (currentUser) {
       const updatedUser = {
         ...currentUser,
         role: newRole,
-        isSeller: newRole === "seller" || newRole === "renter",
+        isSeller: newRole === "seller",
       };
       setCurrentUser(updatedUser);
       localStorage.setItem("currentUser", JSON.stringify(updatedUser));

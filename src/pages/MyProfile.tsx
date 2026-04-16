@@ -2,7 +2,9 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { TrustBadge } from "@/components/TrustBadge";
 import { StarRating } from "@/components/StarRating";
+import { Button } from "@/components/ui/button";
 import { User, Phone, Shield, CheckCircle, Mail, MapPin, Calendar } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 const mockUser = {
   name: "You (Demo User)",
@@ -19,6 +21,8 @@ const mockUser = {
 };
 
 const MyProfile = () => {
+  const { currentUser, switchRole } = useUser();
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -37,6 +41,38 @@ const MyProfile = () => {
                 <TrustBadge score={mockUser.trustScore} showScore />
               </div>
             </div>
+          </div>
+
+          {/* Account Type / Role Switcher */}
+          <div className="rounded-xl border bg-card p-5 space-y-3">
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <Shield className="h-4 w-4" /> Account Type
+            </h3>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => switchRole("buyer")}
+                variant={currentUser?.role === "buyer" ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+              >
+                👤 Buyer
+              </Button>
+              <Button
+                onClick={() => switchRole("seller")}
+                variant={currentUser?.role === "seller" ? "default" : "outline"}
+                size="sm"
+                className="flex-1"
+              >
+                🏪 Seller
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {currentUser?.role === "seller" ? (
+                <>You can list and rent items. Visit your listings to get started!</>
+              ) : (
+                <>Switch to Seller to list and rent items</>
+              )}
+            </p>
           </div>
 
           {/* Contact Info */}
