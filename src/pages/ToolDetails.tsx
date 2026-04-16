@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { tools, negotiatedOffers } from "@/lib/mockData";
-import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle } from "lucide-react";
+import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle, AlertCircle, Edit2 } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { createOffer } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -19,12 +19,17 @@ const ToolDetails = () => {
   const { toast } = useToast();
   const { id } = useParams();
   const tool = tools.find(t => t.id === id);
-  const [days, setDays] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [showGuide, setShowGuide] = useState(false);
   const [showOfferInput, setShowOfferInput] = useState(false);
   const [offerPrice, setOfferPrice] = useState("");
+  const [offerMessage, setOfferMessage] = useState("");
   const [offers, setOffers] = useState(negotiatedOffers);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // Check if current user is the owner of this tool
+  const isOwner = currentUser && tool && currentUser.id === tool.owner.id;
 
   if (!tool) {
     return (
@@ -38,9 +43,22 @@ const ToolDetails = () => {
     );
   }
 
-  const totalPrice = tool.pricePerDay * days;
-  const today = new Date().toISOString().split("T")[0];
-  const endDate = new Date(new Date().setDate(new Date().getDate() + days)).toISOString().split("T")[0];
+  // Calculate rental duration and price
+  const calculateDays = () => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(1, diffDays);
+  };
+
+  const days = calculateDays();
+  const totalRentalPrice = tool.pricePerDay * days;
+  const securityDeposit = tool.deposit;
+  const totalAmount = totalRentalPrice + securityDeposit;
+  const minDate = new Date().toISOString().split("T")[0];
+  const maxDate = new Date(new Date().setDate(new Date().getDate() + 365)).toISOString().split("T")[0];
 
   const handleDownloadGuide = () => {
     if (!tool.usageGuide) return;
@@ -54,8 +72,13 @@ const ToolDetails = () => {
   };
 
   const handleSubmitOffer = () => {
+    if (!startDate || !endDate) {
+      toast({ title: "Error", description: "Please select rental dates first" });
+      return;
+    }
+
     if (!offerPrice || Number(offerPrice) <= 0) {
-      alert("Please enter a valid price");
+      toast({ title: "Error", description: "Please enter a valid price" });
       return;
     }
 
@@ -66,15 +89,32 @@ const ToolDetails = () => {
       currentUser.id,
       tool.owner.id,
       Number(offerPrice),
-      totalPrice,
-      today,
+      totalRentalPrice,
+      startDate,
       endDate
     );
 
     setOffers([...offers, newOffer]);
     setOfferPrice("");
+    setOfferMessage("");
     setShowOfferInput(false);
     setShowSuccessModal(true);
+    toast({ title: "Success", description: "Your negotiation offer has been sent!" });
+  };
+
+  const handleRentNow = () => {
+    if (!startDate || !endDate) {
+      toast({ title: "Error", description: "Please select rental dates first" });
+      return;
+    }
+
+    if (!tool.available) {
+      toast({ title: "Error", description: "This tool is not available for selected dates" });
+      return;
+    }
+
+    setShowSuccessModal(true);
+    toast({ title: "Success", description: "Proceeding to booking..." });
   };
 
   return (
@@ -156,52 +196,106 @@ const ToolDetails = () => {
 
             {/* Rental section */}
             <div className="rounded-xl border bg-card p-4 space-y-4">
-              <h3 className="text-sm font-semibold">Rent this tool</h3>
-              <div>
-                <label className="text-xs text-muted-foreground">Duration (days)</label>
-                <div className="flex items-center gap-3 mt-1">
-                  <Button variant="outline" size="sm" onClick={() => setDays(Math.max(1, days - 1))}>-</Button>
-                  <span className="text-lg font-semibold w-8 text-center">{days}</span>
-                  <Button variant="outline" size="sm" onClick={() => setDays(days + 1)}>+</Button>
+              <h3 className="text-sm font-semibold">
+                {isOwner ? "Manage Listing" : "Rent this tool"}
+              </h3>
+
+              {/* Date Selection - Only for Buyer Mode */}
+              {currentUser && currentUser.mode === "buyer" && !isOwner && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground block mb-1.5">From</label>
+                      <Input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        min={minDate}
+                        max={maxDate}
+                        className="text-sm h-9"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground block mb-1.5">To</label>
+                      <Input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        min={startDate || minDate}
+                        max={maxDate}
+                        disabled={!startDate}
+                        className="text-sm h-9"
+                      />
+                    </div>
+                  </div>
+                  {startDate && endDate && days > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium">{days}</span> day{days > 1 ? "s" : ""} • {startDate} to {endDate}
+                    </p>
+                  )}
                 </div>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">₹{tool.pricePerDay} × {days} day{days > 1 ? "s" : ""}</span><span className="font-medium">₹{totalPrice}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Security deposit</span><span className="font-medium">₹{tool.deposit}</span></div>
-                <div className="border-t pt-2 flex justify-between font-semibold"><span>Total</span><span className="text-primary">₹{totalPrice + tool.deposit}</span></div>
-              </div>
+              )}
+
+              {/* Price Breakdown */}
+              {startDate && endDate && days > 0 && (
+                <div className="space-y-2 text-sm bg-muted/50 rounded-lg p-3">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">₹{tool.pricePerDay} × {days} day{days > 1 ? "s" : ""}</span>
+                    <span className="font-medium">₹{totalRentalPrice}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Security deposit</span>
+                    <span className="font-medium">₹{securityDeposit}</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-semibold text-primary">
+                    <span>Total amount</span>
+                    <span>₹{totalAmount}</span>
+                  </div>
+                </div>
+              )}
 
               {/* Negotiated Offer Section - Buyer Mode Only */}
-              {currentUser && currentUser.mode === "buyer" && (
+              {currentUser && currentUser.mode === "buyer" && !isOwner && startDate && endDate && (
                 <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 space-y-3">
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                    <span className="text-sm font-medium text-blue-900 dark:text-blue-100">Make an Offer</span>
+                    <span className="text-sm font-medium text-blue-900 dark:text-blue-100">Send a Negotiation Offer</span>
                   </div>
                   {!showOfferInput ? (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full"
+                      className="w-full text-xs"
                       onClick={() => setShowOfferInput(true)}
                     >
-                      Negotiate Price
+                      Propose Different Price
                     </Button>
                   ) : (
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-blue-800 dark:text-blue-200">Your offer price (₹)</label>
-                      <div className="flex gap-2">
+                      <div>
+                        <label className="text-xs font-medium text-blue-800 dark:text-blue-200 block mb-1">Total Price (₹)</label>
                         <Input
                           type="number"
-                          placeholder={String(totalPrice - 50)}
+                          placeholder={String(totalRentalPrice)}
                           value={offerPrice}
                           onChange={(e) => setOfferPrice(e.target.value)}
                           className="h-8 text-sm"
-                          min={1}
-                          max={totalPrice}
+                          min={Math.floor(totalRentalPrice * 0.5)}
+                          max={totalRentalPrice}
                         />
                       </div>
-                      <p className="text-xs text-blue-600 dark:text-blue-300">Original: ₹{totalPrice} | Min: ₹{Math.floor(totalPrice * 0.7)}</p>
+                      <div>
+                        <label className="text-xs font-medium text-blue-800 dark:text-blue-200 block mb-1">Message (optional)</label>
+                        <Input
+                          type="text"
+                          placeholder="e.g., I have a small project..."
+                          value={offerMessage}
+                          onChange={(e) => setOfferMessage(e.target.value)}
+                          className="h-8 text-sm"
+                          maxLength={100}
+                        />
+                      </div>
+                      <p className="text-xs text-blue-600 dark:text-blue-300">Original: ₹{totalRentalPrice} | Min: ₹{Math.floor(totalRentalPrice * 0.5)}</p>
                       <div className="flex gap-2">
                         <Button
                           size="sm"
@@ -217,6 +311,7 @@ const ToolDetails = () => {
                           onClick={() => {
                             setShowOfferInput(false);
                             setOfferPrice("");
+                            setOfferMessage("");
                           }}
                         >
                           Cancel
@@ -227,24 +322,45 @@ const ToolDetails = () => {
                 </div>
               )}
 
-              {currentUser && currentUser.mode === "buyer" ? (
+              {/* Action Buttons - Mode & Ownership Specific */}
+              {isOwner && currentUser?.mode === "seller" ? (
+                // Owner in Seller Mode - Show management actions
+                <div className="space-y-2">
+                  <Button className="w-full" size="lg">
+                    <Edit2 className="h-4 w-4 mr-2" /> Edit Listing
+                  </Button>
+                  <Button variant="outline" className="w-full" size="lg">
+                    Manage Availability
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">You own this tool</p>
+                </div>
+              ) : currentUser && currentUser.mode === "buyer" && !isOwner ? (
+                // Buyer Mode - Show rent buttons
                 <>
                   <Button
                     className="w-full"
                     size="lg"
-                    disabled={!tool.available}
-                    onClick={() => {
-                      setShowSuccessModal(true);
-                    }}
+                    disabled={!startDate || !endDate || !tool.available}
+                    onClick={handleRentNow}
                   >
-                    {tool.available ? "Request to Rent" : "Currently Unavailable"}
+                    Rent Now
                   </Button>
-                  {!tool.available && (
-                    <p className="text-xs text-orange-600 dark:text-orange-400 text-center">This tool is not available for the selected dates</p>
+                  {(!startDate || !endDate) && (
+                    <div className="flex items-center gap-2 text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 p-2 rounded">
+                      <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span>Select rental dates to proceed</span>
+                    </div>
+                  )}
+                  {!tool.available && startDate && endDate && (
+                    <div className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 p-2 rounded">
+                      <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span>Not available for selected dates</span>
+                    </div>
                   )}
                 </>
-              ) : currentUser && currentUser.mode === "seller" ? (
-                <>
+              ) : currentUser && currentUser.mode === "seller" && !isOwner ? (
+                // Seller Mode but not owner - Show restriction
+                <div className="space-y-2">
                   <Button
                     className="w-full"
                     size="lg"
@@ -253,9 +369,13 @@ const ToolDetails = () => {
                   >
                     Cannot Rent in Seller Mode
                   </Button>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 text-center">Switch to Buyer Mode to rent this tool</p>
-                </>
+                  <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 p-2 rounded">
+                    <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                    <span>Switch to Buyer Mode to rent tools</span>
+                  </div>
+                </div>
               ) : (
+                // Not logged in
                 <>
                   <Button
                     className="w-full"
@@ -264,7 +384,7 @@ const ToolDetails = () => {
                   >
                     Login to Rent
                   </Button>
-                  <p className="text-xs text-muted-foreground text-center">You must be logged in to rent tools</p>
+                  <p className="text-xs text-muted-foreground text-center">Create an account to start renting tools</p>
                 </>
               )}
             </div>
