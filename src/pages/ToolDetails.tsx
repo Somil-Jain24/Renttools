@@ -6,6 +6,7 @@ import { TrustBadge } from "@/components/TrustBadge";
 import { StarRating } from "@/components/StarRating";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { tools, negotiatedOffers } from "@/lib/mockData";
 import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
@@ -23,6 +24,7 @@ const ToolDetails = () => {
   const [showOfferInput, setShowOfferInput] = useState(false);
   const [offerPrice, setOfferPrice] = useState("");
   const [offers, setOffers] = useState(negotiatedOffers);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   if (!tool) {
     return (
@@ -72,7 +74,7 @@ const ToolDetails = () => {
     setOffers([...offers, newOffer]);
     setOfferPrice("");
     setShowOfferInput(false);
-    alert("Offer sent to the owner! They will review it within 2 hours.");
+    setShowSuccessModal(true);
   };
 
   return (
@@ -233,11 +235,7 @@ const ToolDetails = () => {
                   if (!currentUser) {
                     navigate("/signup");
                   } else {
-                    // Show success toast
-                    toast({
-                      title: "Request Sent Successfully!",
-                      description: "Your rental request has been sent to the owner. They will review it within 2 hours.",
-                    });
+                    setShowSuccessModal(true);
                   }
                 }}
               >
@@ -264,6 +262,28 @@ const ToolDetails = () => {
         </div>
       </div>
       <Footer />
+
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="items-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-950 mb-4">
+              <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <DialogTitle className="text-center">Request Sent Successfully!</DialogTitle>
+          </DialogHeader>
+          <DialogDescription className="text-center space-y-2">
+            <p>Your request has been sent to the owner.</p>
+            <p className="font-semibold text-foreground">The owner will review it within 2 hours.</p>
+          </DialogDescription>
+          <Button
+            onClick={() => setShowSuccessModal(false)}
+            className="w-full mt-4"
+          >
+            Great, Thanks!
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
