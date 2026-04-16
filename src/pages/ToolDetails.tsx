@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { TrustBadge } from "@/components/TrustBadge";
@@ -7,8 +7,11 @@ import { StarRating } from "@/components/StarRating";
 import { Button } from "@/components/ui/button";
 import { tools } from "@/lib/mockData";
 import { MapPin, User, Shield, ArrowLeft, FileText, Download } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 const ToolDetails = () => {
+  const navigate = useNavigate();
+  const { currentUser } = useUser();
   const { id } = useParams();
   const tool = tools.find(t => t.id === id);
   const [days, setDays] = useState(1);
@@ -132,9 +135,29 @@ const ToolDetails = () => {
                 <div className="flex justify-between"><span className="text-muted-foreground">Security deposit</span><span className="font-medium">₹{tool.deposit}</span></div>
                 <div className="border-t pt-2 flex justify-between font-semibold"><span>Total</span><span className="text-primary">₹{totalPrice + tool.deposit}</span></div>
               </div>
-              <Button className="w-full" size="lg" disabled={!tool.available}>
-                {tool.available ? "Request to Rent" : "Currently Unavailable"}
+              <Button
+                className="w-full"
+                size="lg"
+                disabled={!tool.available || !currentUser}
+                onClick={() => {
+                  if (!currentUser) {
+                    navigate("/signup");
+                  } else if (currentUser.isSeller) {
+                    alert("Sellers cannot rent tools. Switch to buyer account to rent.");
+                  } else {
+                    // Handle rental request
+                    alert("Rental request submitted!");
+                  }
+                }}
+              >
+                {!currentUser ? "Login to Rent" : currentUser.isSeller ? "Sellers Cannot Rent" : tool.available ? "Request to Rent" : "Currently Unavailable"}
               </Button>
+              {!currentUser && (
+                <p className="text-xs text-muted-foreground text-center">You must be logged in to rent tools</p>
+              )}
+              {currentUser?.isSeller && (
+                <p className="text-xs text-amber-600 text-center">Switch to a buyer account to rent tools</p>
+              )}
             </div>
 
             {/* Pickup */}

@@ -1,18 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { categories } from "@/lib/mockData";
-import { Upload, ImagePlus, FileText } from "lucide-react";
+import { Upload, ImagePlus, FileText, Lock } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 const ListTool = () => {
+  const navigate = useNavigate();
+  const { currentUser, isLoading } = useUser();
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [usageGuide, setUsageGuide] = useState("");
   const [manualFile, setManualFile] = useState<File | null>(null);
 
+  useEffect(() => {
+    if (!isLoading && !currentUser) {
+      navigate("/signup");
+    }
+  }, [currentUser, isLoading, navigate]);
+
   const subcategories = categories.find(c => c.name === selectedCategory)?.subcategories || [];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!currentUser?.isSeller) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="text-center max-w-md">
+            <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-2">Seller Account Required</h1>
+            <p className="text-muted-foreground mb-6">
+              You need to create a seller account to list tools. Update your account type to become a seller.
+            </p>
+            <Button onClick={() => navigate("/account")} className="mr-3">
+              Go to Account Settings
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/browse")}>
+              Browse Tools Instead
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

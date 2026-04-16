@@ -18,9 +18,8 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-3 text-sm">Explore</h4>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <Link to="/how-it-works" className="block hover:text-foreground">How It Works</Link>
               <Link to="/about" className="block hover:text-foreground">About Us</Link>
-              <Link to="/faq" className="block hover:text-foreground">FAQ</Link>
+              <Link to="/browse" className="block hover:text-foreground">Browse Tools</Link>
             </div>
           </div>
           <div>
