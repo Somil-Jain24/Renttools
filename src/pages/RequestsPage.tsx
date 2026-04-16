@@ -4,88 +4,91 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useUser } from "@/context/UserContext";
-import { Bell, Clock, CheckCircle, XCircle, Star, MessageSquare } from "lucide-react";
+import { Bell, Clock, CheckCircle, XCircle, Star, MessageSquare, AlertCircle, User } from "lucide-react";
+import { tools, requests as mockRequests, owners } from "@/lib/mockData";
+import { useToast } from "@/hooks/use-toast";
 
 const RequestsPage = () => {
   const { currentUser } = useUser();
+  const { toast } = useToast();
   const [selectedTab, setSelectedTab] = useState("all");
+  const [showBuyerProfile, setShowBuyerProfile] = useState(false);
+  const [selectedBuyer, setSelectedBuyer] = useState<typeof owners[0] | null>(null);
+  const [requestStates, setRequestStates] = useState<{ [key: string]: string }>({});
 
-  // Mock buyer requests sent
-  const buyerRequestsSent = [
-    {
-      id: "req-1",
-      toolName: "Cordless Drill",
-      ownerName: "John Doe",
-      ownerScore: 92,
-      proposedPrice: 300,
-      originalPrice: 350,
-      startDate: "2025-01-20",
-      endDate: "2025-01-22",
-      status: "Pending" as const,
-      sentDate: "2025-01-15",
-      daysToExpire: 2,
-      message: "Would you accept ₹300 instead? I have a small home repair project.",
-    },
-    {
-      id: "req-2",
-      toolName: "Extension Ladder",
-      ownerName: "Sarah Smith",
-      ownerScore: 88,
-      proposedPrice: 150,
-      originalPrice: 200,
-      startDate: "2025-01-25",
-      endDate: "2025-01-26",
-      status: "Accepted" as const,
-      sentDate: "2025-01-14",
-      daysToExpire: 0,
-      message: "Perfect timing for my project!",
-    },
-    {
-      id: "req-3",
-      toolName: "Power Saw",
-      ownerName: "Mike Johnson",
-      ownerScore: 85,
-      proposedPrice: 400,
-      originalPrice: 450,
-      startDate: "2025-01-18",
-      endDate: "2025-01-20",
-      status: "Rejected" as const,
-      sentDate: "2025-01-12",
-      daysToExpire: 0,
-      message: "Looking for a reasonable rate.",
-    },
-  ];
+  // Filter requests based on role
+  const buyerRequestsSent = mockRequests.filter(r => r.buyerId === currentUser?.id).map(req => {
+    const tool = tools.find(t => t.id === req.toolId);
+    const seller = owners.find(o => o.id === req.sellerId);
+    const startDate = new Date(req.startDate);
+    const endDate = new Date(req.endDate);
+    const daysRemaining = Math.ceil((new Date(req.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
-  // Mock incoming requests (seller)
-  const incomingRequests = [
-    {
-      id: "incoming-1",
-      toolName: "Cordless Drill",
-      buyerName: "Alice Renter",
-      buyerScore: 88,
-      proposedPrice: 300,
-      listedPrice: 350,
-      startDate: "2025-01-20",
-      endDate: "2025-01-22",
-      status: "New" as const,
-      receivedDate: "2025-01-15",
-      message: "Would you accept ₹300 instead? I have a small home repair project.",
-    },
-    {
-      id: "incoming-2",
-      toolName: "Extension Ladder",
-      buyerName: "Bob Constructor",
-      buyerScore: 92,
-      proposedPrice: 180,
-      listedPrice: 200,
-      startDate: "2025-01-25",
-      endDate: "2025-01-26",
-      status: "New" as const,
-      receivedDate: "2025-01-14",
-      message: "Need it for a quick job.",
-    },
-  ];
+    return {
+      id: req.id,
+      toolName: tool?.name || "Unknown Tool",
+      toolImage: tool?.images[0],
+      ownerName: seller?.name || "Unknown",
+      ownerScore: seller?.trustScore || 0,
+      proposedPrice: req.proposedPrice,
+      originalPrice: tool ? tool.pricePerDay * Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) : 0,
+      startDate: req.startDate,
+      endDate: req.endDate,
+      status: req.status as const,
+      sentDate: req.createdAt,
+      daysToExpire: Math.max(0, daysRemaining),
+      message: req.message || "",
+    };
+  });
+
+  const incomingRequests = mockRequests.filter(r => {
+    const tool = tools.find(t => t.id === r.toolId);
+    return tool && tool.owner.id === currentUser?.id;
+  }).map(req => {
+    const tool = tools.find(t => t.id === req.toolId);
+    const buyer = owners.find(o => o.id === req.buyerId);
+    const startDate = new Date(req.startDate);
+    const endDate = new Date(req.endDate);
+
+    return {
+      id: req.id,
+      toolName: tool?.name || "Unknown Tool",
+      toolImage: tool?.images[0],
+      buyerId: req.buyerId,
+      buyerName: buyer?.name || "Unknown",
+      buyerScore: buyer?.trustScore || 0,
+      proposedPrice: req.proposedPrice,
+      listedPrice: tool ? tool.pricePerDay * Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) : 0,
+      startDate: req.startDate,
+      endDate: req.endDate,
+      status: req.status as const,
+      receivedDate: req.createdAt,
+      message: req.message || "",
+    };
+  });
+
+  const handleCancelRequest = (requestId: string) => {
+    setRequestStates({ ...requestStates, [requestId]: "CANCELLED" });
+    toast({ title: "Success", description: "Request cancelled" });
+  };
+
+  const handleAcceptRequest = (requestId: string) => {
+    setRequestStates({ ...requestStates, [requestId]: "ACCEPTED" });
+    toast({ title: "Success", description: "Request accepted" });
+  };
+
+  const handleRejectRequest = (requestId: string) => {
+    setRequestStates({ ...requestStates, [requestId]: "REJECTED" });
+    toast({ title: "Success", description: "Request rejected" });
+  };
+
+  const handleViewBuyerProfile = (buyer: typeof owners[0]) => {
+    setSelectedBuyer(buyer);
+    setShowBuyerProfile(true);
+  };
 
   if (!currentUser) {
     return (
@@ -101,9 +104,12 @@ const RequestsPage = () => {
 
   const isBuyerMode = currentUser.mode === "buyer";
   const requests = isBuyerMode ? buyerRequestsSent : incomingRequests;
-  const filteredRequests = selectedTab === "all" 
-    ? requests 
-    : requests.filter(r => r.status.toLowerCase() === selectedTab);
+  const filteredRequests = selectedTab === "all"
+    ? requests
+    : requests.filter(r => {
+        const currentStatus = requestStates[r.id] || r.status;
+        return currentStatus.toLowerCase() === selectedTab;
+      });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -134,36 +140,47 @@ const RequestsPage = () => {
         {/* Requests List */}
         {filteredRequests.length > 0 ? (
           <div className="space-y-4">
-            {filteredRequests.map(request => (
-              isBuyerMode ? (
-                // Buyer view of sent requests
-                <Card key={request.id} className="border-border/60">
+            {filteredRequests.map(request => {
+              const currentStatus = requestStates[request.id] || request.status;
+              const statusColor = {
+                "PENDING": "bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300",
+                "ACCEPTED": "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300",
+                "REJECTED": "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300",
+                "EXPIRED": "bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300",
+              }[currentStatus] || "bg-gray-100 dark:bg-gray-900";
+
+              return (
+                <Card key={request.id} className="border-border/60 overflow-hidden">
                   <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      {/* Tool Image */}
+                      {request.toolImage && (
+                        <div className="sm:w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                          <img src={request.toolImage} alt={request.toolName} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
                       {/* Left side - Request details */}
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="text-lg font-semibold">{request.toolName}</h3>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div className="min-w-0">
+                            <h3 className="text-lg font-semibold truncate">{request.toolName}</h3>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Owner: <span className="font-medium text-foreground">{request.ownerName}</span>
-                              <span className="ml-2 inline-flex items-center gap-1">
+                              {isBuyerMode ? "Owner" : "Buyer"}:{" "}
+                              <span className="font-medium text-foreground">
+                                {isBuyerMode ? request.ownerName : request.buyerName}
+                              </span>
+                              <span className="ml-2 inline-flex items-center gap-0.5">
                                 <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                {request.ownerScore}
+                                {isBuyerMode ? request.ownerScore : request.buyerScore}
                               </span>
                             </p>
                           </div>
-                          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-                            request.status === "Pending"
-                              ? "bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300"
-                              : request.status === "Accepted"
-                              ? "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300"
-                              : "bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300"
-                          }`}>
-                            {request.status === "Pending" && <Clock className="h-3 w-3 mr-1" />}
-                            {request.status === "Accepted" && <CheckCircle className="h-3 w-3 mr-1" />}
-                            {request.status === "Rejected" && <XCircle className="h-3 w-3 mr-1" />}
-                            {request.status}
+                          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${statusColor}`}>
+                            {currentStatus === "PENDING" && <Clock className="h-3 w-3 mr-1" />}
+                            {currentStatus === "ACCEPTED" && <CheckCircle className="h-3 w-3 mr-1" />}
+                            {currentStatus === "REJECTED" && <XCircle className="h-3 w-3 mr-1" />}
+                            {currentStatus}
                           </span>
                         </div>
 
@@ -173,107 +190,101 @@ const RequestsPage = () => {
 
                         <div className="grid grid-cols-2 gap-4 mb-3">
                           <div>
-                            <p className="text-xs text-muted-foreground">Original Price</p>
-                            <p className="font-semibold">₹{request.originalPrice}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground">Your Offer</p>
-                            <p className="font-semibold text-primary">₹{request.proposedPrice}</p>
-                          </div>
-                        </div>
-
-                        <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground">
-                          <p className="flex gap-2">
-                            <MessageSquare className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                            <span>"{request.message}"</span>
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Right side - Actions */}
-                      <div className="flex flex-col gap-2 sm:items-end">
-                        {request.status === "Pending" && (
-                          <>
-                            <p className="text-xs text-muted-foreground">Expires in {request.daysToExpire} days</p>
-                            <Button size="sm" variant="outline">Cancel Request</Button>
-                          </>
-                        )}
-                        {request.status === "Accepted" && (
-                          <>
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700">Proceed to Payment</Button>
-                            <Button size="sm" variant="outline">View Details</Button>
-                          </>
-                        )}
-                        {request.status === "Rejected" && (
-                          <>
-                            <Button size="sm" variant="outline">Make New Offer</Button>
-                            <Button size="sm" variant="ghost">View Details</Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                // Seller view of incoming requests
-                <Card key={request.id} className="border-border/60">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                      {/* Left side - Request details */}
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="text-lg font-semibold">{request.toolName}</h3>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Buyer: <span className="font-medium text-foreground">{request.buyerName}</span>
-                              <span className="ml-2 inline-flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                                {request.buyerScore}
-                              </span>
-                            </p>
-                          </div>
-                          <span className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 px-3 py-1 text-xs font-medium">
-                            <Bell className="h-3 w-3 mr-1" />
-                            {request.status}
-                          </span>
-                        </div>
-
-                        <p className="text-sm text-muted-foreground mt-3 mb-3">
-                          {request.startDate} to {request.endDate}
-                        </p>
-
-                        <div className="grid grid-cols-2 gap-4 mb-3">
-                          <div>
-                            <p className="text-xs text-muted-foreground">Listed Price</p>
-                            <p className="font-semibold">₹{request.listedPrice}/day</p>
+                            <p className="text-xs text-muted-foreground">{isBuyerMode ? "Original Price" : "Listed Price"}</p>
+                            <p className="font-semibold">₹{isBuyerMode ? request.originalPrice : request.listedPrice}</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground">Offered Price</p>
-                            <p className={`font-semibold ${request.proposedPrice < request.listedPrice ? 'text-orange-600' : 'text-success'}`}>
+                            <p className={`font-semibold ${request.proposedPrice < (isBuyerMode ? request.originalPrice : request.listedPrice) ? 'text-orange-600' : 'text-green-600'}`}>
                               ₹{request.proposedPrice}
                             </p>
                           </div>
                         </div>
 
-                        <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground">
-                          <p className="flex gap-2">
-                            <MessageSquare className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                            <span>"{request.message}"</span>
-                          </p>
-                        </div>
+                        {request.message && (
+                          <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground">
+                            <p className="flex gap-2">
+                              <MessageSquare className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                              <span>"{request.message}"</span>
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Right side - Actions */}
-                      <div className="flex flex-col gap-2 sm:items-end">
-                        <Button size="sm" className="bg-green-600 hover:bg-green-700">Accept</Button>
-                        <Button size="sm" variant="outline">Counter Offer</Button>
-                        <Button size="sm" variant="outline" className="text-red-600">Reject</Button>
+                      <div className="flex flex-col gap-2 sm:items-end sm:justify-start">
+                        {isBuyerMode ? (
+                          // Buyer Mode Actions
+                          <>
+                            {currentStatus === "PENDING" && (
+                              <>
+                                <p className="text-xs text-muted-foreground text-right">Expires in {request.daysToExpire} days</p>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleCancelRequest(request.id)}
+                                >
+                                  Cancel Request
+                                </Button>
+                              </>
+                            )}
+                            {currentStatus === "ACCEPTED" && (
+                              <>
+                                <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                                  Proceed to Payment
+                                </Button>
+                                <Button size="sm" variant="outline">View Details</Button>
+                              </>
+                            )}
+                            {currentStatus === "REJECTED" && (
+                              <>
+                                <Button size="sm" variant="outline">Make New Offer</Button>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          // Seller Mode Actions
+                          <>
+                            {currentStatus === "PENDING" && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="bg-green-600 hover:bg-green-700"
+                                  onClick={() => handleAcceptRequest(request.id)}
+                                >
+                                  Accept
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleRejectRequest(request.id)}
+                                  className="text-red-600"
+                                >
+                                  Reject
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleViewBuyerProfile(owners.find(o => o.id === (request as any).buyerId) || owners[0])}
+                                >
+                                  View Profile
+                                </Button>
+                              </>
+                            )}
+                            {currentStatus === "ACCEPTED" && (
+                              <p className="text-xs text-green-600 font-medium">Accepted</p>
+                            )}
+                            {currentStatus === "REJECTED" && (
+                              <p className="text-xs text-red-600 font-medium">Rejected</p>
+                            )}
+                          </>
+                        )}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              )
-            ))}
+              );
+            })}
           </div>
         ) : (
           <Card className="border-border/60">
@@ -291,6 +302,55 @@ const RequestsPage = () => {
       </div>
 
       <Footer />
+
+      {/* Buyer Profile Modal */}
+      <Dialog open={showBuyerProfile} onOpenChange={setShowBuyerProfile}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Buyer Profile</DialogTitle>
+          </DialogHeader>
+          {selectedBuyer && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                  <User className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">{selectedBuyer.name}</h3>
+                  <div className="flex items-center gap-1 text-sm">
+                    <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                    <span>{selectedBuyer.trustScore}/100</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Rentals Completed</p>
+                  <p className="font-semibold">{selectedBuyer.completedRentals || 0}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Member Since</p>
+                  <p className="font-semibold">{selectedBuyer.memberSince || "Recently"}</p>
+                </div>
+                {selectedBuyer.damageReports !== undefined && selectedBuyer.damageReports > 0 && (
+                  <div className="rounded-lg bg-yellow-50 dark:bg-yellow-950/30 p-3">
+                    <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                      <AlertCircle className="h-3 w-3 inline mr-1" />
+                      {selectedBuyer.damageReports} damage report{selectedBuyer.damageReports > 1 ? 's' : ''} on record
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t space-y-2">
+                <Button className="w-full">Accept Request</Button>
+                <Button variant="outline" className="w-full">Send Message</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -35,6 +35,8 @@ export type VerificationStatus = "NOT_VERIFIED" | "SUBMITTED" | "VERIFIED";
 export type DamageLevel = "NONE" | "MINOR" | "MAJOR";
 export type TrustLevel = "basic" | "verified" | "trusted";
 export type OfferStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED" | "CONFIRMED";
+export type RequestStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED";
+export type TransactionStatus = "PENDING" | "PAID" | "FAILED";
 
 export interface ChatMessage {
   id: string;
@@ -69,6 +71,59 @@ export interface NegotiatedOffer {
   createdAt: string;
   expiresAt: string;
   confirmedAt?: string;
+}
+
+export interface Request {
+  id: string;
+  toolId: string;
+  buyerId: string;
+  sellerId: string;
+  proposedPrice: number;
+  startDate: string;
+  endDate: string;
+  message?: string;
+  status: RequestStatus;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+}
+
+export interface WishlistItem {
+  id: string;
+  userId: string;
+  toolId: string;
+  createdAt: string;
+}
+
+export interface Transaction {
+  id: string;
+  sellerId: string;
+  toolId: string;
+  buyerId: string;
+  rentalStartDate: string;
+  rentalEndDate: string;
+  rentalAmount: number;
+  depositAmount: number;
+  depositRefunded: boolean;
+  status: TransactionStatus;
+  createdAt: string;
+  paidAt?: string;
+}
+
+export interface ToolAnalytics {
+  toolId: string;
+  views: number;
+  bookings: number;
+  revenue: number;
+}
+
+export interface ToolViewData {
+  toolId: string;
+  toolName: string;
+  views: number;
+  bookings: number;
+  conversionRate: number;
+  revenue: number;
 }
 
 export const categories = [
@@ -249,6 +304,95 @@ export const negotiatedOffers: NegotiatedOffer[] = [
     createdAt: "2026-04-16 10:00",
     expiresAt: "2026-04-16 12:00",
   },
+];
+
+export const requests: Request[] = [
+  {
+    id: "req-1",
+    toolId: "t1",
+    buyerId: "b1",
+    sellerId: "u1",
+    proposedPrice: 120,
+    startDate: "2026-04-20",
+    endDate: "2026-04-22",
+    message: "Would you accept ₹120/day? I have a small home repair project.",
+    status: "PENDING",
+    createdAt: "2026-04-16 10:00",
+    updatedAt: "2026-04-16 10:00",
+    expiresAt: "2026-04-17 10:00",
+  },
+  {
+    id: "req-2",
+    toolId: "t2",
+    buyerId: "b1",
+    sellerId: "u2",
+    proposedPrice: 150,
+    startDate: "2026-04-25",
+    endDate: "2026-04-26",
+    message: "Perfect timing for my project!",
+    status: "ACCEPTED",
+    createdAt: "2026-04-14 14:00",
+    updatedAt: "2026-04-15 10:00",
+    expiresAt: "2026-04-18 14:00",
+  },
+];
+
+export const wishlistItems: WishlistItem[] = [
+  { id: "w1", userId: "current-user", toolId: "t1", createdAt: "2026-04-10 09:00" },
+  { id: "w2", userId: "current-user", toolId: "t5", createdAt: "2026-04-11 15:30" },
+  { id: "w3", userId: "current-user", toolId: "t8", createdAt: "2026-04-12 11:45" },
+];
+
+export const transactions: Transaction[] = [
+  {
+    id: "txn-1",
+    sellerId: "u1",
+    toolId: "t1",
+    buyerId: "b1",
+    rentalStartDate: "2026-04-10",
+    rentalEndDate: "2026-04-14",
+    rentalAmount: 600,
+    depositAmount: 500,
+    depositRefunded: false,
+    status: "PENDING",
+    createdAt: "2026-04-10 08:00",
+  },
+  {
+    id: "txn-2",
+    sellerId: "u1",
+    toolId: "t1",
+    buyerId: "b2",
+    rentalStartDate: "2026-04-01",
+    rentalEndDate: "2026-04-04",
+    rentalAmount: 450,
+    depositAmount: 500,
+    depositRefunded: true,
+    status: "PAID",
+    createdAt: "2026-04-01 08:00",
+    paidAt: "2026-04-04 17:00",
+  },
+  {
+    id: "txn-3",
+    sellerId: "u1",
+    toolId: "t5",
+    buyerId: "b1",
+    rentalStartDate: "2026-03-20",
+    rentalEndDate: "2026-03-22",
+    rentalAmount: 200,
+    depositAmount: 400,
+    depositRefunded: true,
+    status: "PAID",
+    createdAt: "2026-03-20 08:00",
+    paidAt: "2026-03-22 18:00",
+  },
+];
+
+export const toolAnalytics: ToolViewData[] = [
+  { toolId: "t1", toolName: "Bosch Impact Drill", views: 124, bookings: 8, conversionRate: 6.45, revenue: 2400 },
+  { toolId: "t2", toolName: "6ft Aluminium Ladder", views: 98, bookings: 6, conversionRate: 6.12, revenue: 480 },
+  { toolId: "t5", toolName: "Stanley Toolkit (65 pcs)", views: 87, bookings: 5, conversionRate: 5.75, revenue: 500 },
+  { toolId: "t8", toolName: "Honda Lawn Mower", views: 156, bookings: 4, conversionRate: 2.56, revenue: 900 },
+  { toolId: "t12", toolName: "Steam Cleaner Pro", views: 112, bookings: 7, conversionRate: 6.25, revenue: 1260 },
 ];
 
 export function getTrustLevel(score: number): TrustLevel {
