@@ -28,7 +28,7 @@ export function Navbar() {
           <span className="text-xl font-extrabold tracking-tight text-foreground">Rent<span className="text-primary">Kart</span></span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/60 px-4 py-2 text-sm shadow-soft transition-shadow focus-within:shadow-card focus-within:border-primary/30">
+        <div className="hidden md:flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/60 px-4 py-2 text-sm shadow-soft transition-shadow focus-within:shadow-card focus-within:border-primary/30 w-full max-w-[500px]">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input placeholder="Search tools..." className="bg-transparent outline-none w-48 placeholder:text-muted-foreground text-foreground" />
         </div>
