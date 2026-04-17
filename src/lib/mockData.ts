@@ -73,6 +73,7 @@ export interface Rental {
   startDate: string;
   endDate: string;
   totalPrice: number;
+  amountDeposited?: number;
   borrower?: ToolOwner;
   chatMessages?: ChatMessage[];
 }
@@ -317,22 +318,22 @@ export const tools: Tool[] = [
 
 export const myRentals: Rental[] = [
   // Active rentals
-  { id: "r1", tool: tools[0], status: "BORROWED", depositStatus: "LOCKED", startDate: "2026-04-10", endDate: "2026-04-14", totalPrice: 600,
+  { id: "r1", tool: tools[0], status: "BORROWED", depositStatus: "LOCKED", startDate: "2026-04-10", endDate: "2026-04-14", totalPrice: 600, amountDeposited: 500,
     chatMessages: [
       { id: "m1", senderId: "u1", senderName: "Rahul Sharma", text: "Hi! Your request is approved. You can pick up the drill tomorrow.", timestamp: "2026-04-09 10:30" },
       { id: "m2", senderId: "me", senderName: "You", text: "Great! I'll come by around 11 AM.", timestamp: "2026-04-09 10:45" },
       { id: "m3", senderId: "u1", senderName: "Rahul Sharma", text: "Perfect, see you then!", timestamp: "2026-04-09 11:00" },
     ],
   },
-  { id: "r3", tool: tools[4], status: "REQUESTED", depositStatus: "LOCKED", startDate: "2026-04-15", endDate: "2026-04-17", totalPrice: 200 },
-  { id: "r4", tool: tools[3], status: "APPROVED", depositStatus: "LOCKED", startDate: "2026-04-20", endDate: "2026-04-23", totalPrice: 600 },
+  { id: "r3", tool: tools[4], status: "REQUESTED", depositStatus: "LOCKED", startDate: "2026-04-15", endDate: "2026-04-17", totalPrice: 200, amountDeposited: 400 },
+  { id: "r4", tool: tools[3], status: "APPROVED", depositStatus: "LOCKED", startDate: "2026-04-20", endDate: "2026-04-23", totalPrice: 600, amountDeposited: 800 },
 
   // Past rentals
-  { id: "r2", tool: tools[1], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-04-01", endDate: "2026-04-03", totalPrice: 160 },
-  { id: "r5", tool: tools[6], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-28", endDate: "2026-03-30", totalPrice: 120 },
-  { id: "r6", tool: tools[9], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-20", endDate: "2026-03-22", totalPrice: 100 },
-  { id: "r7", tool: tools[2], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-10", endDate: "2026-03-13", totalPrice: 750 },
-  { id: "r8", tool: tools[7], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-02-28", endDate: "2026-03-03", totalPrice: 1200 },
+  { id: "r2", tool: tools[1], status: "RETURNED", depositStatus: "LOCKED", startDate: "2026-04-01", endDate: "2026-04-03", totalPrice: 160, amountDeposited: 300 },
+  { id: "r5", tool: tools[6], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-28", endDate: "2026-03-30", totalPrice: 120, amountDeposited: 200 },
+  { id: "r6", tool: tools[9], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-20", endDate: "2026-03-22", totalPrice: 100, amountDeposited: 150 },
+  { id: "r7", tool: tools[2], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-10", endDate: "2026-03-13", totalPrice: 750, amountDeposited: 1000 },
+  { id: "r8", tool: tools[7], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-02-28", endDate: "2026-03-03", totalPrice: 1200, amountDeposited: 1500 },
 ];
 
 export const myListings: Rental[] = [

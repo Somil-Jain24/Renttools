@@ -7,12 +7,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Clock, AlertCircle, CheckCircle, MessageSquare, Eye, Zap } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { myRentals } from "@/lib/mockData";
+import { myRentals, Rental } from "@/lib/mockData";
+import { ExtendRentalDialog } from "@/components/ExtendRentalDialog";
 
 const MyRentals = () => {
   const navigate = useNavigate();
   const { currentUser } = useUser();
   const [statusFilter, setStatusFilter] = useState<"all" | "REQUESTED" | "APPROVED" | "BORROWED">("all");
+  const [extendDialogOpen, setExtendDialogOpen] = useState(false);
+  const [selectedRentalForExtend, setSelectedRentalForExtend] = useState<Rental | null>(null);
 
   // Filter for active and upcoming rentals only (exclude RETURNED)
   const activeRentals = myRentals.filter(r => r.status !== "RETURNED");
@@ -174,6 +177,12 @@ const MyRentals = () => {
                           <span className="text-muted-foreground">Total Amount:</span>
                           <span className="font-semibold">₹{rental.totalPrice}</span>
                         </div>
+                        {rental.status === "BORROWED" && rental.amountDeposited && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Security deposit:</span>
+                            <span className="font-semibold">₹{rental.amountDeposited}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -221,20 +230,25 @@ const MyRentals = () => {
                         >
                           <Eye className="h-4 w-4" /> View Details
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full flex items-center gap-2"
-                          onClick={() => alert("Chat feature coming soon")}
-                        >
-                          <MessageSquare className="h-4 w-4" /> Chat with Owner
-                        </Button>
+                        {rental.status !== "REQUESTED" && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full flex items-center gap-2"
+                            onClick={() => navigate(`/chat/${rental.id}`)}
+                          >
+                            <MessageSquare className="h-4 w-4" /> Chat with Owner
+                          </Button>
+                        )}
                         {rental.status === "BORROWED" && (
                           <Button
                             size="sm"
                             variant="outline"
                             className="w-full"
-                            onClick={() => alert("Extend rental feature coming soon")}
+                            onClick={() => {
+                              setSelectedRentalForExtend(rental);
+                              setExtendDialogOpen(true);
+                            }}
                           >
                             Extend Rental
                           </Button>
@@ -271,6 +285,19 @@ const MyRentals = () => {
       </div>
 
       <Footer />
+
+      {/* Extend Rental Dialog */}
+      {selectedRentalForExtend && (
+        <ExtendRentalDialog
+          open={extendDialogOpen}
+          onOpenChange={setExtendDialogOpen}
+          rental={selectedRentalForExtend}
+          onExtend={(newEndDate) => {
+            alert(`Rental extended to ${newEndDate}`);
+            setExtendDialogOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

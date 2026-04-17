@@ -31,6 +31,7 @@ import MyRentals from "./pages/MyRentals";
 import MyOrders from "./pages/MyOrders";
 import SellerProfile from "./pages/SellerProfile";
 import Wishlist from "./pages/Wishlist";
+import Chat from "./pages/Chat";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requiredMode="buyer">
                     <MyRentals />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/chat/:rentalId"
+                element={
+                  <ProtectedRoute requireAuth={true}>
+                    <Chat />
                   </ProtectedRoute>
                 }
               />
