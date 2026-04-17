@@ -62,12 +62,12 @@ const BrowseTools = () => {
           <span className="h-1 w-1 rounded-full bg-primary" />
           Category
         </h4>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+        <Select value={selectedCategory || "all-categories"} onValueChange={(value) => setSelectedCategory(value === "all-categories" ? "" : value)}>
           <SelectTrigger className="w-full rounded-xl">
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Categories</SelectItem>
+            <SelectItem value="all-categories">All Categories</SelectItem>
             {categories.map(c => (
               <SelectItem key={c.name} value={c.name}>
                 <span className="mr-2">{c.icon}</span>{c.name}
