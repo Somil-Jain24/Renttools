@@ -38,6 +38,15 @@ export type OfferStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED" | "CON
 export type RequestStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED";
 export type TransactionStatus = "PENDING" | "PAID" | "FAILED";
 
+export interface RentalRating {
+  id: string;
+  rentalId: string;
+  rating: number; // 1-5 stars
+  comment: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface ChatMessage {
   id: string;
   senderId: string;
@@ -279,6 +288,7 @@ export const tools: Tool[] = [
 ];
 
 export const myRentals: Rental[] = [
+  // Active rentals
   { id: "r1", tool: tools[0], status: "BORROWED", depositStatus: "LOCKED", startDate: "2026-04-10", endDate: "2026-04-14", totalPrice: 600,
     chatMessages: [
       { id: "m1", senderId: "u1", senderName: "Rahul Sharma", text: "Hi! Your request is approved. You can pick up the drill tomorrow.", timestamp: "2026-04-09 10:30" },
@@ -286,8 +296,15 @@ export const myRentals: Rental[] = [
       { id: "m3", senderId: "u1", senderName: "Rahul Sharma", text: "Perfect, see you then!", timestamp: "2026-04-09 11:00" },
     ],
   },
-  { id: "r2", tool: tools[1], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-04-01", endDate: "2026-04-03", totalPrice: 160 },
   { id: "r3", tool: tools[4], status: "REQUESTED", depositStatus: "LOCKED", startDate: "2026-04-15", endDate: "2026-04-17", totalPrice: 200 },
+  { id: "r4", tool: tools[3], status: "APPROVED", depositStatus: "LOCKED", startDate: "2026-04-20", endDate: "2026-04-23", totalPrice: 600 },
+
+  // Past rentals
+  { id: "r2", tool: tools[1], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-04-01", endDate: "2026-04-03", totalPrice: 160 },
+  { id: "r5", tool: tools[6], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-28", endDate: "2026-03-30", totalPrice: 120 },
+  { id: "r6", tool: tools[9], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-20", endDate: "2026-03-22", totalPrice: 100 },
+  { id: "r7", tool: tools[2], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-10", endDate: "2026-03-13", totalPrice: 750 },
+  { id: "r8", tool: tools[7], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-02-28", endDate: "2026-03-03", totalPrice: 1200 },
 ];
 
 export const myListings: Rental[] = [
@@ -351,6 +368,14 @@ export const wishlistItems: WishlistItem[] = [
   { id: "w1", userId: "current-user", toolId: "t1", createdAt: "2026-04-10 09:00" },
   { id: "w2", userId: "current-user", toolId: "t5", createdAt: "2026-04-11 15:30" },
   { id: "w3", userId: "current-user", toolId: "t8", createdAt: "2026-04-12 11:45" },
+];
+
+export const rentalRatings: RentalRating[] = [
+  { id: "rating-1", rentalId: "r2", rating: 5, comment: "Great ladder! Very sturdy and well-maintained. Rahul was very helpful. Will rent again!", createdAt: "2026-04-03 16:30", updatedAt: "2026-04-03 16:30" },
+  { id: "rating-2", rentalId: "r5", rating: 4, comment: "Good multimeter. Works perfectly. A bit compact but does the job.", createdAt: "2026-03-30 14:15", updatedAt: "2026-03-30 14:15" },
+  { id: "rating-3", rentalId: "r6", rating: 5, comment: "Excellent pipe wrench! Heavy duty and in perfect condition. Priya's service was top notch.", createdAt: "2026-03-22 17:45", updatedAt: "2026-03-22 17:45" },
+  { id: "rating-4", rentalId: "r7", rating: 4, comment: "Pressure washer works great. Only minor issue with the nozzle adjustment.", createdAt: "2026-03-13 15:20", updatedAt: "2026-03-13 15:20" },
+  { id: "rating-5", rentalId: "r8", rating: 5, comment: "Amazing lawn mower! Made my garden look perfect. Rahul was very responsive and the tool was in excellent condition.", createdAt: "2026-03-03 18:00", updatedAt: "2026-03-03 18:00" },
 ];
 
 export const transactions: Transaction[] = [

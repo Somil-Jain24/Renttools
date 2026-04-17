@@ -27,6 +27,8 @@ import MyAccount from "./pages/MyAccount";
 import MyListings from "./pages/MyListings";
 import Earnings from "./pages/Earnings";
 import Analytics from "./pages/Analytics";
+import MyRentals from "./pages/MyRentals";
+import MyOrders from "./pages/MyOrders";
 
 const queryClient = new QueryClient();
 
@@ -83,7 +85,7 @@ const App = () => (
                 path="/my-rentals"
                 element={
                   <ProtectedRoute requiredMode="buyer">
-                    <BuyerDashboard />
+                    <MyRentals />
                   </ProtectedRoute>
                 }
               />
@@ -91,7 +93,7 @@ const App = () => (
                 path="/my-orders"
                 element={
                   <ProtectedRoute requiredMode="buyer">
-                    <BuyerDashboard />
+                    <MyOrders />
                   </ProtectedRoute>
                 }
               />
