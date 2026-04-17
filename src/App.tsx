@@ -24,6 +24,9 @@ import HowItWorks from "./pages/HowItWorks";
 import FAQ from "./pages/FAQ";
 import MyProfile from "./pages/MyProfile";
 import MyAccount from "./pages/MyAccount";
+import MyListings from "./pages/MyListings";
+import Earnings from "./pages/Earnings";
+import Analytics from "./pages/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -114,7 +117,7 @@ const App = () => (
                 path="/my-listings"
                 element={
                   <ProtectedRoute requiredMode="seller">
-                    <SellerDashboard />
+                    <MyListings />
                   </ProtectedRoute>
                 }
               />
@@ -130,7 +133,7 @@ const App = () => (
                 path="/earnings"
                 element={
                   <ProtectedRoute requiredMode="seller">
-                    <SellerDashboard />
+                    <Earnings />
                   </ProtectedRoute>
                 }
               />
@@ -138,7 +141,7 @@ const App = () => (
                 path="/analytics"
                 element={
                   <ProtectedRoute requiredMode="seller">
-                    <SellerDashboard />
+                    <Analytics />
                   </ProtectedRoute>
                 }
               />

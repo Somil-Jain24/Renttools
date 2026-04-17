@@ -126,6 +126,16 @@ export interface ToolViewData {
   revenue: number;
 }
 
+export interface SellerListing {
+  id: string;
+  toolId: string;
+  sellerId: string;
+  status: "Active" | "Paused" | "Inactive";
+  createdAt: string;
+  views: number;
+  bookings: number;
+}
+
 export const categories = [
   {
     name: "Power Tools", icon: "⚡",
@@ -344,6 +354,64 @@ export const wishlistItems: WishlistItem[] = [
 ];
 
 export const transactions: Transaction[] = [
+  // Current user transactions
+  {
+    id: "txn-demo-1",
+    sellerId: "current-user",
+    toolId: "t1",
+    buyerId: "b1",
+    rentalStartDate: "2026-04-10",
+    rentalEndDate: "2026-04-14",
+    rentalAmount: 600,
+    depositAmount: 500,
+    depositRefunded: false,
+    status: "PENDING",
+    createdAt: "2026-04-10 08:00",
+  },
+  {
+    id: "txn-demo-2",
+    sellerId: "current-user",
+    toolId: "t4",
+    buyerId: "b2",
+    rentalStartDate: "2026-04-05",
+    rentalEndDate: "2026-04-08",
+    rentalAmount: 750,
+    depositAmount: 1000,
+    depositRefunded: true,
+    status: "PAID",
+    createdAt: "2026-04-05 08:00",
+    paidAt: "2026-04-08 17:00",
+  },
+  {
+    id: "txn-demo-3",
+    sellerId: "current-user",
+    toolId: "t8",
+    buyerId: "b1",
+    rentalStartDate: "2026-03-28",
+    rentalEndDate: "2026-03-31",
+    rentalAmount: 900,
+    depositAmount: 1500,
+    depositRefunded: true,
+    status: "PAID",
+    createdAt: "2026-03-28 08:00",
+    paidAt: "2026-03-31 18:00",
+  },
+  {
+    id: "txn-demo-4",
+    sellerId: "current-user",
+    toolId: "t5",
+    buyerId: "b2",
+    rentalStartDate: "2026-03-20",
+    rentalEndDate: "2026-03-22",
+    rentalAmount: 200,
+    depositAmount: 400,
+    depositRefunded: true,
+    status: "PAID",
+    createdAt: "2026-03-20 08:00",
+    paidAt: "2026-03-22 18:00",
+  },
+
+  // Other sellers' transactions
   {
     id: "txn-1",
     sellerId: "u1",
@@ -393,6 +461,40 @@ export const toolAnalytics: ToolViewData[] = [
   { toolId: "t5", toolName: "Stanley Toolkit (65 pcs)", views: 87, bookings: 5, conversionRate: 5.75, revenue: 500 },
   { toolId: "t8", toolName: "Honda Lawn Mower", views: 156, bookings: 4, conversionRate: 2.56, revenue: 900 },
   { toolId: "t12", toolName: "Steam Cleaner Pro", views: 112, bookings: 7, conversionRate: 6.25, revenue: 1260 },
+];
+
+// Seller listings - tools listed by each seller
+export const sellerListings: SellerListing[] = [
+  // Current demo user (current-user) listings
+  { id: "sl-demo-1", toolId: "t1", sellerId: "current-user", status: "Active", createdAt: "2026-02-15", views: 124, bookings: 8 },
+  { id: "sl-demo-2", toolId: "t4", sellerId: "current-user", status: "Active", createdAt: "2026-02-12", views: 134, bookings: 9 },
+  { id: "sl-demo-3", toolId: "t8", sellerId: "current-user", status: "Active", createdAt: "2026-03-01", views: 156, bookings: 4 },
+  { id: "sl-demo-4", toolId: "t12", sellerId: "current-user", status: "Paused", createdAt: "2026-01-20", views: 112, bookings: 7 },
+  { id: "sl-demo-5", toolId: "t5", sellerId: "current-user", status: "Active", createdAt: "2026-02-10", views: 87, bookings: 5 },
+
+  // Rahul Sharma (u1) listings
+  { id: "sl-1", toolId: "t1", sellerId: "u1", status: "Active", createdAt: "2026-02-15", views: 124, bookings: 8 },
+  { id: "sl-2", toolId: "t5", sellerId: "u1", status: "Active", createdAt: "2026-02-10", views: 87, bookings: 5 },
+  { id: "sl-3", toolId: "t8", sellerId: "u1", status: "Active", createdAt: "2026-03-01", views: 156, bookings: 4 },
+  { id: "sl-4", toolId: "t12", sellerId: "u1", status: "Paused", createdAt: "2026-01-20", views: 112, bookings: 7 },
+  { id: "sl-5", toolId: "t16", sellerId: "u1", status: "Active", createdAt: "2026-03-10", views: 65, bookings: 3 },
+
+  // Priya Patel (u2) listings
+  { id: "sl-6", toolId: "t2", sellerId: "u2", status: "Active", createdAt: "2026-02-20", views: 98, bookings: 6 },
+  { id: "sl-7", toolId: "t6", sellerId: "u2", status: "Active", createdAt: "2026-02-25", views: 78, bookings: 4 },
+  { id: "sl-8", toolId: "t10", sellerId: "u2", status: "Active", createdAt: "2026-03-05", views: 45, bookings: 2 },
+  { id: "sl-9", toolId: "t14", sellerId: "u2", status: "Paused", createdAt: "2026-01-15", views: 56, bookings: 3 },
+
+  // Amit Singh (u3) listings
+  { id: "sl-10", toolId: "t3", sellerId: "u3", status: "Inactive", createdAt: "2026-02-01", views: 120, bookings: 5 },
+  { id: "sl-11", toolId: "t9", sellerId: "u3", status: "Active", createdAt: "2026-02-28", views: 92, bookings: 4 },
+  { id: "sl-12", toolId: "t13", sellerId: "u3", status: "Active", createdAt: "2026-03-08", views: 71, bookings: 2 },
+
+  // Sneha Reddy (u4) listings
+  { id: "sl-13", toolId: "t4", sellerId: "u4", status: "Active", createdAt: "2026-02-12", views: 134, bookings: 9 },
+  { id: "sl-14", toolId: "t7", sellerId: "u4", status: "Active", createdAt: "2026-02-18", views: 68, bookings: 4 },
+  { id: "sl-15", toolId: "t11", sellerId: "u4", status: "Active", createdAt: "2026-03-03", views: 105, bookings: 5 },
+  { id: "sl-16", toolId: "t15", sellerId: "u4", status: "Paused", createdAt: "2026-01-25", views: 42, bookings: 1 },
 ];
 
 export function getTrustLevel(score: number): TrustLevel {
