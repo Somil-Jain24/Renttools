@@ -405,16 +405,16 @@ const ToolDetails = () => {
                 )}
 
                 {/* Right: Location */}
-                <div className="space-y-3 md:pl-4">
-                  <h3 className="text-sm font-semibold flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-primary" /> Location
-                  </h3>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-3">{tool.location}</p>
+                <div className="space-y-2 md:pl-4">
+                  {/* Header: Title + Button */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" /> Location
+                    </h3>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full text-xs"
+                      className="text-xs h-7"
                       onClick={() => {
                         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tool.location)}`;
                         window.open(mapsUrl, "_blank");
@@ -423,6 +423,8 @@ const ToolDetails = () => {
                       <MapPin className="h-3 w-3 mr-1" /> Get Directions
                     </Button>
                   </div>
+                  {/* Address */}
+                  <p className="text-sm text-muted-foreground">{tool.location}</p>
                 </div>
               </div>
             </div>
