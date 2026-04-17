@@ -100,7 +100,7 @@ const BuyerDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="orders" className="flex gap-2">
               <ShoppingBag className="h-4 w-4" />
-              <span className="hidden sm:inline">Orders</span>
+              <span className="hidden sm:inline">History</span>
             </TabsTrigger>
             <TabsTrigger value="requests" className="flex gap-2">
               <Bell className="h-4 w-4" />
@@ -157,7 +157,7 @@ const BuyerDashboard = () => {
           {/* My Orders Tab */}
           <TabsContent value="orders" className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Order History</h3>
+              <h3 className="text-lg font-semibold mb-4">My History</h3>
               {myOrders.length > 0 ? (
                 <div className="space-y-3">
                   {myOrders.map(order => (

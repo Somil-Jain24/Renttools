@@ -5,7 +5,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, MapPin, Star, Lock, Zap, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Heart, MapPin, Star, Lock, Zap, Trash2, CheckCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { wishlistItems, tools, categories } from "@/lib/mockData";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +16,7 @@ const Wishlist = () => {
   const { currentUser } = useUser();
   const { toast } = useToast();
   const [wishlist, setWishlist] = useState(wishlistItems.filter(w => w.userId === currentUser?.id));
+  const [showDemoModal, setShowDemoModal] = useState(false);
 
   // Access control
   if (!currentUser) {
@@ -55,6 +57,11 @@ const Wishlist = () => {
   const handleQuickRent = (toolId: string) => {
     navigate(`/tools/${toolId}?focus=dates`);
     toast({ title: "Info", description: "Scroll down to select rental dates" });
+  };
+
+  const handleRequestDemo = () => {
+    setShowDemoModal(true);
+    toast({ title: "Success", description: "Demo request sent to the owner!" });
   };
 
   return (
@@ -158,24 +165,32 @@ const Wishlist = () => {
                       </p>
 
                       {/* Actions */}
-                      <div className="grid grid-cols-2 gap-2 pt-2">
+                      <div className="space-y-2 pt-2">
+                        <Button
+                          size="sm"
+                          className="w-full"
+                          disabled={!tool.available}
+                          onClick={() => handleQuickRent(tool.id)}
+                        >
+                          <Zap className="h-4 w-4 mr-1" /> Rent
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"
+                          className="w-full"
+                          onClick={handleRequestDemo}
+                        >
+                          Request Demo
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           className="w-full"
                           asChild
                         >
                           <Link to={`/tools/${tool.id}`} className="flex items-center justify-center gap-1">
                             View Details
                           </Link>
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="w-full flex items-center justify-center gap-1"
-                          disabled={!tool.available}
-                          onClick={() => handleQuickRent(tool.id)}
-                        >
-                          <Zap className="h-4 w-4" /> Rent
                         </Button>
                       </div>
                     </CardContent>
@@ -261,6 +276,28 @@ const Wishlist = () => {
           </div>
         )}
       </div>
+
+      {/* Demo Request Modal */}
+      <Dialog open={showDemoModal} onOpenChange={setShowDemoModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="items-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 mb-4">
+              <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <DialogTitle className="text-center">Demo Request Sent!</DialogTitle>
+          </DialogHeader>
+          <div className="text-center space-y-2 text-sm text-muted-foreground">
+            <div>Your demo request has been sent to the owner.</div>
+            <div className="font-semibold text-foreground">The owner will contact you shortly to schedule the demo.</div>
+          </div>
+          <Button
+            onClick={() => setShowDemoModal(false)}
+            className="w-full mt-4"
+          >
+            Got it!
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
