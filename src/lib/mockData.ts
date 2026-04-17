@@ -97,6 +97,17 @@ export interface Request {
   expiresAt: string;
 }
 
+export interface DemoRequest {
+  id: string;
+  toolId: string;
+  buyerId: string;
+  sellerId: string;
+  message?: string;
+  status: RequestStatus;
+  createdAt: string;
+  expiresAt: string;
+}
+
 export interface WishlistItem {
   id: string;
   userId: string;
