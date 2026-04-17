@@ -583,7 +583,7 @@ const ListTool = () => {
             className="w-full"
             onClick={handleSubmit}
           >
-            <Upload className="h-4 w-4 mr-2" /> List Tool
+            Submit
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">
