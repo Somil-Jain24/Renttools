@@ -1,15 +1,23 @@
-import { MapPin } from "lucide-react";
+import { MapPin, Send } from "lucide-react";
 import type { Tool } from "@/lib/mockData";
 import { TrustBadge } from "./TrustBadge";
 import { StarRating } from "./StarRating";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface ToolCardProps {
   tool: Tool;
+  onRequestRental?: (tool: Tool) => void;
 }
 
-export function ToolCard({ tool }: ToolCardProps) {
+export function ToolCard({ tool, onRequestRental }: ToolCardProps) {
+  const handleRequestClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onRequestRental?.(tool);
+  };
+
   return (
     <Link to={`/tools/${tool.id}`} className="group block">
       <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1">
@@ -47,13 +55,23 @@ export function ToolCard({ tool }: ToolCardProps) {
             <span>{tool.distance} km away</span>
           </div>
 
-          <div className="flex items-center justify-between pt-1 border-t border-border/40">
+          <div className="flex items-center justify-between pt-1 border-t border-border/40 mb-3">
             <div className="flex items-center gap-2">
               <StarRating score={tool.owner.trustScore} />
               <span className="text-xs font-bold text-muted-foreground">{tool.owner.trustScore}</span>
             </div>
             <TrustBadge score={tool.owner.trustScore} showLabel={false} />
           </div>
+
+          <Button
+            onClick={handleRequestClick}
+            variant="outline"
+            size="sm"
+            className="w-full rounded-lg border-primary/30 hover:bg-primary/5"
+          >
+            <Send className="h-3.5 w-3.5 mr-1.5" />
+            Request Rental
+          </Button>
         </div>
       </div>
     </Link>

@@ -2,15 +2,20 @@ import { useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToolCard } from "@/components/ToolCard";
+import { RentalRequestModal } from "@/components/RentalRequestModal";
 import { tools, categories } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Filter, X, SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import type { Tool } from "@/lib/mockData";
 
 const BrowseTools = () => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
+  const { toast } = useToast();
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [priceRange, setPriceRange] = useState([0, 500]);
@@ -18,6 +23,8 @@ const BrowseTools = () => {
   const [availableOnly, setAvailableOnly] = useState(false);
   const [sortBy, setSortBy] = useState<"nearest" | "cheapest">("nearest");
   const [showFilters, setShowFilters] = useState(false);
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const [selectedToolForRequest, setSelectedToolForRequest] = useState<Tool | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...tools];
@@ -29,6 +36,25 @@ const BrowseTools = () => {
     return result;
   }, [selectedCategory, priceRange, maxDistance, availableOnly, sortBy]);
 
+  const handleRequestRental = (tool: Tool) => {
+    setSelectedToolForRequest(tool);
+    setRequestModalOpen(true);
+  };
+
+  const handleSubmitRequest = (request: {
+    toolId: string;
+    startDate: string;
+    endDate: string;
+    proposedPrice: number;
+    message: string;
+  }) => {
+    // In a real app, this would send to backend
+    toast({
+      title: "Rental Request Sent!",
+      description: `Your request for ${selectedToolForRequest?.name} has been sent to ${selectedToolForRequest?.owner.name}`,
+    });
+  };
+
   const FilterPanel = () => (
     <div className="space-y-7">
       <div>
@@ -36,16 +62,19 @@ const BrowseTools = () => {
           <span className="h-1 w-1 rounded-full bg-primary" />
           Category
         </h4>
-        <div className="space-y-0.5">
-          <button onClick={() => setSelectedCategory("")} className={`block w-full text-left rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${!selectedCategory ? 'bg-primary/10 text-primary font-semibold shadow-soft' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}>
-            All Categories
-          </button>
-          {categories.map(c => (
-            <button key={c.name} onClick={() => setSelectedCategory(c.name)} className={`block w-full text-left rounded-xl px-3 py-2.5 text-sm transition-all duration-200 ${selectedCategory === c.name ? 'bg-primary/10 text-primary font-semibold shadow-soft' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}>
-              <span className="mr-2">{c.icon}</span>{c.name}
-            </button>
-          ))}
-        </div>
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="w-full rounded-xl">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Categories</SelectItem>
+            {categories.map(c => (
+              <SelectItem key={c.name} value={c.name}>
+                <span className="mr-2">{c.icon}</span>{c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="border-t border-border/60 pt-6">
@@ -131,7 +160,7 @@ const BrowseTools = () => {
 
           <div className="flex-1">
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map(t => <ToolCard key={t.id} tool={t} />)}
+              {filtered.map(t => <ToolCard key={t.id} tool={t} onRequestRental={handleRequestRental} />)}
             </div>
             {filtered.length === 0 && (
               <div className="text-center py-24 text-muted-foreground">
@@ -143,6 +172,14 @@ const BrowseTools = () => {
           </div>
         </div>
       </div>
+
+      <RentalRequestModal
+        open={requestModalOpen}
+        onOpenChange={setRequestModalOpen}
+        tool={selectedToolForRequest}
+        onSubmit={handleSubmitRequest}
+      />
+
       <Footer />
     </div>
   );
