@@ -80,9 +80,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       phone: "+91 98765 43210",
       location: "Bengaluru, India",
       isSeller: true,
-      mode: "buyer", // Default to buyer mode
+      mode: "buyer", // Default to buyer mode - user can switch to seller mode
       trustScores: defaultTrustScores,
-      sellerProfile: { ...defaultSellerProfile, isRegistered: true, verificationStatus: "verified" },
+      sellerProfile: { ...defaultSellerProfile, isRegistered: true, verificationStatus: "verified", bankAccountLinked: true },
       emailVerified: true,
       phoneVerified: true,
       createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days ago
