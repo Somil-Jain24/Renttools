@@ -179,7 +179,7 @@ const MyRentals = () => {
                         </div>
                         {rental.status === "BORROWED" && rental.amountDeposited && (
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Amount Deposited:</span>
+                            <span className="text-muted-foreground">Security deposit:</span>
                             <span className="font-semibold">₹{rental.amountDeposited}</span>
                           </div>
                         )}

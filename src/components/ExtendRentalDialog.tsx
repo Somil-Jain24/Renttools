@@ -65,11 +65,10 @@ export function ExtendRentalDialog({
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  disabled={!selectedDate}
                 >
                   {selectedDate
                     ? format(selectedDate, "MMM dd, yyyy")
-                    : "Pick a date"}
+                    : "Pick new date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">

@@ -133,11 +133,21 @@ const MyOrders = () => {
                       </div>
 
                       {/* Status */}
-                      <div className="flex flex-col justify-between">
+                      <div className="flex flex-col justify-between gap-3">
                         <div>
-                          <p className="text-xs text-muted-foreground mb-1">Status</p>
+                          <p className="text-xs text-muted-foreground mb-1">Rental Status</p>
                           <p className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 px-2.5 py-0.5 text-xs font-medium">
                             Returned
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Deposit Status</p>
+                          <p className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            rental.depositStatus === "RELEASED"
+                              ? "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                              : "bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300"
+                          }`}>
+                            {rental.depositStatus === "RELEASED" ? "Deposit Release" : "Deposit Locked"}
                           </p>
                         </div>
                       </div>
