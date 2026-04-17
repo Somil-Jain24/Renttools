@@ -147,7 +147,7 @@ const MyOrders = () => {
                               ? "bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
                               : "bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300"
                           }`}>
-                            {rental.depositStatus === "RELEASED" ? "Deposit Release" : "deposit pending"}
+                            {rental.depositStatus === "RELEASED" ? "Deposit Release" : "Deposit Pending"}
                           </p>
                         </div>
                       </div>
