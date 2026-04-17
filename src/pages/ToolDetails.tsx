@@ -138,27 +138,15 @@ const ToolDetails = () => {
           <ArrowLeft className="h-4 w-4" /> Back to browse
         </Link>
 
-        <div className="grid gap-8 lg:grid-cols-5">
-          {/* Images */}
-          <div className="lg:col-span-3">
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Left Column: Image & Owner */}
+          <div className="lg:col-span-1 space-y-5">
+            {/* Product Image */}
             <div className="aspect-[4/3] rounded-2xl bg-muted overflow-hidden border">
               <img src={tool.images[0]} alt={tool.name} className="h-full w-full object-cover" />
             </div>
-          </div>
 
-          {/* Details & Rental */}
-          <div className="lg:col-span-2 space-y-6">
-            <div>
-              <span className="text-xs font-medium text-primary bg-primary/10 rounded-full px-2 py-1">{tool.subcategory || tool.category}</span>
-              <h1 className="text-2xl font-bold mt-2">{tool.name}</h1>
-              <p className="text-muted-foreground mt-2 text-sm">{tool.description}</p>
-            </div>
-
-            <div className="text-3xl font-bold text-primary">
-              ₹{tool.pricePerDay}<span className="text-sm font-normal text-muted-foreground">/day</span>
-            </div>
-
-            {/* Owner */}
+            {/* Owner Section */}
             <div className="rounded-xl border bg-card p-4 space-y-3">
               <h3 className="text-sm font-semibold">Owner</h3>
               <div className="flex items-center gap-3">
@@ -182,30 +170,19 @@ const ToolDetails = () => {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Usage Guide */}
-            {tool.usageGuide && (
-              <div className="rounded-xl border bg-card p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" /> Usage Guide
-                  </h3>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowGuide(!showGuide)}>
-                      {showGuide ? "Hide" : "View"}
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-xs h-7" onClick={handleDownloadGuide}>
-                      <Download className="h-3 w-3 mr-1" /> Download
-                    </Button>
-                  </div>
-                </div>
-                {showGuide && (
-                  <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground whitespace-pre-line">
-                    {tool.usageGuide}
-                  </div>
-                )}
-              </div>
-            )}
+          {/* Right Column: Details & Rental */}
+          <div className="lg:col-span-2 space-y-5">
+            <div>
+              <span className="text-xs font-medium text-primary bg-primary/10 rounded-full px-2 py-1">{tool.subcategory || tool.category}</span>
+              <h1 className="text-2xl font-bold mt-2">{tool.name}</h1>
+              <p className="text-muted-foreground mt-2 text-sm">{tool.description}</p>
+            </div>
+
+            <div className="text-3xl font-bold text-primary">
+              ₹{tool.pricePerDay}<span className="text-sm font-normal text-muted-foreground">/day</span>
+            </div>
 
             {/* Rental section */}
             <div className="rounded-xl border bg-card p-4 space-y-4">
@@ -335,18 +312,6 @@ const ToolDetails = () => {
                 </div>
               )}
 
-              {/* Demo Request Button - Visible to both modes */}
-              {!isOwner && (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  size="lg"
-                  onClick={handleRequestDemo}
-                >
-                  Request Demo
-                </Button>
-              )}
-
               {/* Action Buttons - Mode & Ownership Specific */}
               {isOwner && currentUser?.mode === "seller" ? (
                 // Owner in Seller Mode - Show management actions
@@ -414,13 +379,53 @@ const ToolDetails = () => {
               )}
             </div>
 
-            {/* Pickup */}
-            <div className="rounded-xl border bg-card p-4 space-y-2">
-              <h3 className="text-sm font-semibold flex items-center gap-2"><MapPin className="h-4 w-4" /> Pickup Location</h3>
-              <p className="text-sm text-muted-foreground">{tool.location}</p>
-              <p className="text-xs text-muted-foreground">Self Pickup from Owner Location</p>
-              <div className="aspect-[16/9] rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm">
-                <MapPin className="h-5 w-5 mr-1" /> Map placeholder
+            {/* Usage Guide & Location - Combined Card */}
+            <div className="rounded-xl border bg-card p-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Left: Usage Guide */}
+                {tool.usageGuide && (
+                  <div className="space-y-3 pb-4 md:pb-0 md:border-r">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" /> Usage Guide
+                    </h3>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowGuide(!showGuide)}>
+                        {showGuide ? "Hide" : "View"}
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-xs h-7" onClick={handleDownloadGuide}>
+                        <Download className="h-3 w-3 mr-1" /> Download
+                      </Button>
+                    </div>
+                    {showGuide && (
+                      <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground whitespace-pre-line max-h-40 overflow-y-auto">
+                        {tool.usageGuide}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Right: Location */}
+                <div className="space-y-2 md:pl-4">
+                  {/* Header: Title + Button */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-primary" /> Location
+                    </h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-7"
+                      onClick={() => {
+                        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tool.location)}`;
+                        window.open(mapsUrl, "_blank");
+                      }}
+                    >
+                      <MapPin className="h-3 w-3 mr-1" /> Get Directions
+                    </Button>
+                  </div>
+                  {/* Address */}
+                  <p className="text-sm text-muted-foreground">{tool.location}</p>
+                </div>
               </div>
             </div>
           </div>
