@@ -6,7 +6,7 @@ import { User, Mail, Phone, MapPin, Bell, Shield, LogOut } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 
 const MyAccount = () => {
-  const { currentUser, switchRole } = useUser();
+  const { currentUser, switchMode } = useUser();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -22,27 +22,28 @@ const MyAccount = () => {
             </h3>
             <div className="flex gap-2">
               <Button
-                onClick={() => switchRole("buyer")}
-                variant={currentUser?.role === "buyer" ? "default" : "outline"}
+                onClick={() => switchMode("buyer")}
+                variant={currentUser?.mode === "buyer" ? "default" : "outline"}
                 size="sm"
                 className="flex-1"
               >
                 👤 Buyer
               </Button>
               <Button
-                onClick={() => switchRole("seller")}
-                variant={currentUser?.role === "seller" ? "default" : "outline"}
+                onClick={() => switchMode("seller")}
+                variant={currentUser?.mode === "seller" ? "default" : "outline"}
                 size="sm"
                 className="flex-1"
+                disabled={!currentUser?.isSeller}
               >
                 🏪 Seller
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              {currentUser?.role === "seller" ? (
+              {currentUser?.mode === "seller" ? (
                 <>You can list and rent items. Visit your listings to get started!</>
               ) : (
-                <>Switch to Seller to list and rent items</>
+                <>Switch to Seller to list and rent items {!currentUser?.isSeller && "(requires seller registration)"}</>
               )}
             </p>
           </div>
