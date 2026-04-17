@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star, MessageSquare, Edit2, Archive } from "lucide-react";
+import { Star, MessageSquare, Archive } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { myRentals, rentalRatings } from "@/lib/mockData";
 
@@ -12,7 +12,6 @@ const MyOrders = () => {
   const navigate = useNavigate();
   const { currentUser } = useUser();
   const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
-  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
 
   // Filter for past rentals only (RETURNED status)
   const pastRentals = myRentals.filter(r => r.status === "RETURNED");
@@ -149,22 +148,12 @@ const MyOrders = () => {
                       {rating ? (
                         // Existing Review
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className="font-semibold text-sm mb-1">Your Review</h4>
-                              {renderStars(rating.rating)}
-                            </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setEditingReviewId(editingReviewId === rating.id ? null : rating.id)}
-                              className="flex items-center gap-2"
-                            >
-                              <Edit2 className="h-4 w-4" /> Edit
-                            </Button>
+                          <div>
+                            <h4 className="font-semibold text-sm mb-1">Your Review</h4>
+                            {renderStars(rating.rating)}
                           </div>
 
-                          {expandedReviewId === rating.id || editingReviewId === rating.id ? (
+                          {expandedReviewId === rating.id ? (
                             <div className="space-y-2">
                               <p className="text-sm text-foreground">{rating.comment}</p>
                               <p className="text-xs text-muted-foreground">
@@ -175,29 +164,14 @@ const MyOrders = () => {
                             <p className="text-sm text-foreground line-clamp-2">{rating.comment}</p>
                           )}
 
-                          {!editingReviewId && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setExpandedReviewId(expandedReviewId === rating.id ? null : rating.id)}
-                              className="text-xs"
-                            >
-                              {expandedReviewId === rating.id ? "Show Less" : "Show More"}
-                            </Button>
-                          )}
-
-                          {editingReviewId === rating.id && (
-                            <Button
-                              size="sm"
-                              variant="default"
-                              onClick={() => {
-                                setEditingReviewId(null);
-                                alert("Review update feature coming soon");
-                              }}
-                            >
-                              Save Changes
-                            </Button>
-                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setExpandedReviewId(expandedReviewId === rating.id ? null : rating.id)}
+                            className="text-xs"
+                          >
+                            {expandedReviewId === rating.id ? "Show Less" : "Show More"}
+                          </Button>
                         </div>
                       ) : (
                         // No Review Yet

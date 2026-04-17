@@ -333,7 +333,7 @@ const ToolDetails = () => {
                     disabled={!startDate || !endDate || !tool.available}
                     onClick={handleRentNow}
                   >
-                    Rent Now
+                    Send Request
                   </Button>
                   {(!startDate || !endDate) && (
                     <div className="flex items-center gap-2 text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 p-2 rounded">
@@ -428,6 +428,36 @@ const ToolDetails = () => {
                 </div>
               </div>
             </div>
+
+            {/* Product Reviews Section */}
+            {tool.productReviews && tool.productReviews.length > 0 && (
+              <div className="rounded-xl border bg-card p-4 space-y-4">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <Star className="h-4 w-4 text-primary fill-primary" /> Product Reviews
+                </h3>
+                <div className="space-y-3">
+                  {tool.productReviews.map((review) => (
+                    <div key={review.id} className="border-t pt-3 first:border-t-0 first:pt-0">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div>
+                          <p className="text-sm font-medium">{review.reviewerName}</p>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-3 w-3 ${i < Math.round(review.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{new Date(review.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -444,7 +474,7 @@ const ToolDetails = () => {
           </DialogHeader>
           <div className="text-center space-y-2 text-sm text-muted-foreground">
             <div>Your request has been sent to the owner.</div>
-            <div className="font-semibold text-foreground">The owner will review it shortly.</div>
+            <div className="font-semibold text-foreground">The owner will review it within 24hrs.</div>
           </div>
           <Button
             onClick={() => setShowSuccessModal(false)}
