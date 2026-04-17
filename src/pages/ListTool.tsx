@@ -384,6 +384,11 @@ const ListTool = () => {
                 onChange={handleInputChange}
                 className={errors.pricePerDay ? "border-red-500" : ""}
               />
+              {selectedCategory && (
+                <p className="text-xs text-muted-foreground rounded-lg bg-blue-50 dark:bg-blue-950/20 p-2 border border-blue-200/50 dark:border-blue-800/30">
+                  💡 Similar {selectedCategory} tools average ₹200-400/day. Adjust based on condition and features.
+                </p>
+              )}
               {errors.pricePerDay && (
                 <p className="text-xs text-red-500 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" /> {errors.pricePerDay}

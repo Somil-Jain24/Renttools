@@ -141,6 +141,16 @@ export function Navbar() {
                         </Button>
                       </div>
                     </div>
+                    {currentUser.mode === "seller" && (
+                      <>
+                        <DropdownMenuSeparator className="my-1" />
+                        <DropdownMenuItem asChild>
+                          <Link to="/seller-profile" className="flex items-center gap-2.5 cursor-pointer rounded-lg px-3 py-2">
+                            <Shield className="h-4 w-4 text-muted-foreground" /> KYC & Profile
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </>
                 )}
 
@@ -241,6 +251,9 @@ export function Navbar() {
                         </Button>
                       </div>
                     </div>
+                    {currentUser.mode === "seller" && (
+                      <Link to="/seller-profile" onClick={() => setMenuOpen(false)} className="block py-2.5 px-3 text-sm font-medium rounded-lg hover:bg-secondary transition-colors mt-2">KYC & Profile</Link>
+                    )}
                   </>
                 )}
 

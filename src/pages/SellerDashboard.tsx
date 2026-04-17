@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
-import { ShoppingBag, Bell, DollarSign, BarChart3, Star, Edit2, Pause, Eye } from "lucide-react";
+import { ShoppingBag, Bell, DollarSign, BarChart3, Star, Edit2, Pause, Eye, AlertCircle, CheckCircle, ArrowRight, Plus } from "lucide-react";
 
 const SellerDashboard = () => {
+  const navigate = useNavigate();
   const { currentUser } = useUser();
-  const [selectedTab, setSelectedTab] = useState("listings");
+  const [selectedTab, setSelectedTab] = useState("overview");
 
   // Mock data for seller
   const myListings = [
@@ -78,6 +80,37 @@ const SellerDashboard = () => {
     thisMonthViews: 245,
     thisMonthBookings: 12,
   };
+
+  // Action items for seller
+  const actionItems = [
+    {
+      id: "action-1",
+      type: "pending-request" as const,
+      title: "2 Pending Requests",
+      description: "You have 2 requests awaiting your response",
+      icon: Bell,
+      priority: "high" as const,
+      cta: { label: "Review Requests", href: "/requests" },
+    },
+    {
+      id: "action-2",
+      type: "incomplete-listing" as const,
+      title: "1 Incomplete Listing",
+      description: "Finish setting up your Extension Ladder listing",
+      icon: AlertCircle,
+      priority: "medium" as const,
+      cta: { label: "Complete Listing", href: "/list-tool" },
+    },
+    {
+      id: "action-3",
+      type: "kycNotVerified" as const,
+      title: "KYC Verification Pending",
+      description: "Complete your KYC to ensure smooth payouts",
+      icon: CheckCircle,
+      priority: "medium" as const,
+      cta: { label: "Check Status", href: "/seller-profile" },
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -164,26 +197,193 @@ const SellerDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Action Items & Quick Links */}
+        <div className="grid gap-6 md:grid-cols-2 mb-8">
+          {/* Action Items */}
+          <Card className="border-orange-200/30 dark:border-orange-800/30 bg-gradient-to-br from-orange-50/50 dark:from-orange-950/20 to-transparent">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                Action Items
+              </CardTitle>
+              <CardDescription>Things that need your attention</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {actionItems.map(item => {
+                  const Icon = item.icon;
+                  const bgColor = item.priority === "high"
+                    ? "bg-red-50 dark:bg-red-950/20 border-red-200/30 dark:border-red-800/30"
+                    : "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200/30 dark:border-yellow-800/30";
+
+                  return (
+                    <div key={item.id} className={`rounded-lg border p-3 ${bgColor}`}>
+                      <div className="flex items-start gap-3">
+                        <Icon className={`h-4 w-4 flex-shrink-0 mt-0.5 ${
+                          item.priority === "high" ? "text-red-600 dark:text-red-400" : "text-yellow-600 dark:text-yellow-400"
+                        }`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">{item.title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-2 w-full text-xs h-8"
+                        onClick={() => navigate(item.cta.href)}
+                      >
+                        {item.cta.label}
+                        <ArrowRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Links */}
+          <Card className="border-border/60">
+            <CardHeader>
+              <CardTitle className="text-base">Quick Links</CardTitle>
+              <CardDescription>Access key seller features</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  className="h-auto flex flex-col items-center justify-center py-4 rounded-lg hover:bg-primary/5 transition-colors"
+                  onClick={() => navigate("/list-tool")}
+                >
+                  <Plus className="h-5 w-5 mb-2 text-primary" />
+                  <span className="text-xs font-medium text-center">List Tool</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex flex-col items-center justify-center py-4 rounded-lg hover:bg-primary/5 transition-colors"
+                  onClick={() => navigate("/my-listings")}
+                >
+                  <ShoppingBag className="h-5 w-5 mb-2 text-primary" />
+                  <span className="text-xs font-medium text-center">My Listings</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex flex-col items-center justify-center py-4 rounded-lg hover:bg-primary/5 transition-colors"
+                  onClick={() => navigate("/requests")}
+                >
+                  <Bell className="h-5 w-5 mb-2 text-primary" />
+                  <span className="text-xs font-medium text-center">Requests</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex flex-col items-center justify-center py-4 rounded-lg hover:bg-primary/5 transition-colors"
+                  onClick={() => navigate("/seller-profile")}
+                >
+                  <CheckCircle className="h-5 w-5 mb-2 text-primary" />
+                  <span className="text-xs font-medium text-center">KYC</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsTrigger value="overview" className="flex gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline text-xs">Overview</span>
+            </TabsTrigger>
             <TabsTrigger value="listings" className="flex gap-2">
               <ShoppingBag className="h-4 w-4" />
-              <span className="hidden sm:inline">Listings</span>
+              <span className="hidden sm:inline text-xs">Listings</span>
             </TabsTrigger>
             <TabsTrigger value="requests" className="flex gap-2">
               <Bell className="h-4 w-4" />
-              <span className="hidden sm:inline">Requests</span>
+              <span className="hidden sm:inline text-xs">Requests</span>
             </TabsTrigger>
             <TabsTrigger value="earnings" className="flex gap-2">
               <DollarSign className="h-4 w-4" />
-              <span className="hidden sm:inline">Earnings</span>
+              <span className="hidden sm:inline text-xs">Earnings</span>
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex gap-2">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
+              <span className="hidden sm:inline text-xs">Analytics</span>
             </TabsTrigger>
           </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Recent Activity */}
+              <Card className="border-border/60">
+                <CardHeader>
+                  <CardTitle className="text-base">Recent Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3 pb-4 border-b border-border/60 last:border-b-0">
+                      <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-950 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm">Rental Completed</p>
+                        <p className="text-xs text-muted-foreground">Cordless Drill returned by John Buyer</p>
+                        <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 pb-4 border-b border-border/60 last:border-b-0">
+                      <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-950 flex items-center justify-center flex-shrink-0">
+                        <Bell className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm">New Request</p>
+                        <p className="text-xs text-muted-foreground">Jane requested Extension Ladder</p>
+                        <p className="text-xs text-muted-foreground mt-1">1 day ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-950 flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm">Payout Processed</p>
+                        <p className="text-xs text-muted-foreground">₹2,450 transferred to your account</p>
+                        <p className="text-xs text-muted-foreground mt-1">3 days ago</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Inventory Status */}
+              <Card className="border-border/60">
+                <CardHeader>
+                  <CardTitle className="text-base">Inventory Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {myListings.slice(0, 3).map(listing => (
+                      <div key={listing.id} className="flex items-center justify-between pb-3 border-b border-border/60 last:border-b-0">
+                        <div>
+                          <p className="font-medium text-sm">{listing.name}</p>
+                          <p className="text-xs text-muted-foreground">{listing.availability}</p>
+                        </div>
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          listing.status === "Active"
+                            ? "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300"
+                            : "bg-gray-100 dark:bg-gray-950 text-gray-700 dark:text-gray-300"
+                        }`}>
+                          {listing.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           {/* My Listings Tab */}
           <TabsContent value="listings" className="space-y-4">

@@ -29,6 +29,7 @@ import Earnings from "./pages/Earnings";
 import Analytics from "./pages/Analytics";
 import MyRentals from "./pages/MyRentals";
 import MyOrders from "./pages/MyOrders";
+import SellerProfile from "./pages/SellerProfile";
 
 const queryClient = new QueryClient();
 
@@ -152,6 +153,14 @@ const App = () => (
                 element={
                   <ProtectedRoute requireAuth={true}>
                     <SellerRegistration />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/seller-profile"
+                element={
+                  <ProtectedRoute requiredMode="seller">
+                    <SellerProfile />
                   </ProtectedRoute>
                 }
               />
