@@ -374,7 +374,7 @@ const ToolDetails = () => {
                           maxLength={100}
                         />
                       </div>
-                      <p className="text-xs text-blue-600 dark:text-blue-300">Original: ₹{totalRentalPrice} | Min: ₹{Math.floor(totalRentalPrice * 0.5)}</p>
+                      <p className="text-xs text-blue-600 dark:text-blue-300">Original: ₹{totalRentalPrice}</p>
                       <div className="flex gap-2">
                         <Button
                           size="sm"
