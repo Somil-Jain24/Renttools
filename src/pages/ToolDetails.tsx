@@ -27,6 +27,8 @@ const ToolDetails = () => {
   const [offerMessage, setOfferMessage] = useState("");
   const [offers, setOffers] = useState(negotiatedOffers);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const [demoRequestMessage, setDemoRequestMessage] = useState("");
 
   // Check if current user is the owner of this tool
   const isOwner = currentUser && tool && currentUser.id === tool.owner.id;
@@ -115,6 +117,17 @@ const ToolDetails = () => {
 
     setShowSuccessModal(true);
     toast({ title: "Success", description: "Proceeding to booking..." });
+  };
+
+  const handleRequestDemo = () => {
+    if (!currentUser) {
+      navigate("/signup");
+      return;
+    }
+
+    setShowDemoModal(true);
+    setDemoRequestMessage("");
+    toast({ title: "Success", description: "Demo request sent to the owner!" });
   };
 
   return (
@@ -322,6 +335,18 @@ const ToolDetails = () => {
                 </div>
               )}
 
+              {/* Demo Request Button - Visible to both modes */}
+              {!isOwner && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  size="lg"
+                  onClick={handleRequestDemo}
+                >
+                  Request Demo
+                </Button>
+              )}
+
               {/* Action Buttons - Mode & Ownership Specific */}
               {isOwner && currentUser?.mode === "seller" ? (
                 // Owner in Seller Mode - Show management actions
@@ -414,13 +439,35 @@ const ToolDetails = () => {
           </DialogHeader>
           <div className="text-center space-y-2 text-sm text-muted-foreground">
             <div>Your request has been sent to the owner.</div>
-            <div className="font-semibold text-foreground">The owner will review it within 2 hours.</div>
+            <div className="font-semibold text-foreground">The owner will review it shortly.</div>
           </div>
           <Button
             onClick={() => setShowSuccessModal(false)}
             className="w-full mt-4"
           >
             Great, Thanks!
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Demo Request Modal */}
+      <Dialog open={showDemoModal} onOpenChange={setShowDemoModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="items-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 mb-4">
+              <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <DialogTitle className="text-center">Demo Request Sent!</DialogTitle>
+          </DialogHeader>
+          <div className="text-center space-y-2 text-sm text-muted-foreground">
+            <div>Your demo request has been sent to the owner.</div>
+            <div className="font-semibold text-foreground">The owner will contact you shortly to schedule the demo.</div>
+          </div>
+          <Button
+            onClick={() => setShowDemoModal(false)}
+            className="w-full mt-4"
+          >
+            Got it!
           </Button>
         </DialogContent>
       </Dialog>

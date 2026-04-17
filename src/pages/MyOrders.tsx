@@ -51,7 +51,7 @@ const MyOrders = () => {
       <div className="container mx-auto flex-1 px-4 py-8 max-w-5xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Orders</h1>
+          <h1 className="text-3xl font-bold mb-2">My History</h1>
           <p className="text-muted-foreground">View rental history and manage reviews</p>
         </div>
 

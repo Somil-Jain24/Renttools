@@ -161,6 +161,14 @@ const Wishlist = () => {
                       <div className="grid grid-cols-2 gap-2 pt-2">
                         <Button
                           size="sm"
+                          className="w-full"
+                          disabled={!tool.available}
+                          onClick={() => handleQuickRent(tool.id)}
+                        >
+                          <Zap className="h-4 w-4 mr-1" /> Rent
+                        </Button>
+                        <Button
+                          size="sm"
                           variant="outline"
                           className="w-full"
                           asChild
@@ -168,14 +176,6 @@ const Wishlist = () => {
                           <Link to={`/tools/${tool.id}`} className="flex items-center justify-center gap-1">
                             View Details
                           </Link>
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="w-full flex items-center justify-center gap-1"
-                          disabled={!tool.available}
-                          onClick={() => handleQuickRent(tool.id)}
-                        >
-                          <Zap className="h-4 w-4" /> Rent
                         </Button>
                       </div>
                     </CardContent>

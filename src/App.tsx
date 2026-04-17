@@ -30,6 +30,7 @@ import Analytics from "./pages/Analytics";
 import MyRentals from "./pages/MyRentals";
 import MyOrders from "./pages/MyOrders";
 import SellerProfile from "./pages/SellerProfile";
+import Wishlist from "./pages/Wishlist";
 
 const queryClient = new QueryClient();
 
@@ -102,7 +103,7 @@ const App = () => (
                 path="/wishlist"
                 element={
                   <ProtectedRoute requiredMode="buyer">
-                    <BuyerDashboard />
+                    <Wishlist />
                   </ProtectedRoute>
                 }
               />

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
-import { Package, ShoppingBag, Bell, Heart, Star } from "lucide-react";
+import { Package, ShoppingBag, Bell, Heart, Star, MessageSquare } from "lucide-react";
 import { myRentals, tools } from "@/lib/mockData";
 
 const BuyerDashboard = () => {
@@ -100,7 +100,7 @@ const BuyerDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="orders" className="flex gap-2">
               <ShoppingBag className="h-4 w-4" />
-              <span className="hidden sm:inline">Orders</span>
+              <span className="hidden sm:inline">History</span>
             </TabsTrigger>
             <TabsTrigger value="requests" className="flex gap-2">
               <Bell className="h-4 w-4" />
@@ -139,7 +139,9 @@ const BuyerDashboard = () => {
                           </div>
                           <div className="flex flex-col gap-2 sm:items-end">
                             <Button size="sm">View Details</Button>
-                            <Button size="sm" variant="outline">Contact Owner</Button>
+                            <Button size="sm" variant="outline" className="flex items-center gap-2">
+                              <MessageSquare className="h-4 w-4" /> Chat
+                            </Button>
                           </div>
                         </div>
                       </CardContent>
@@ -157,7 +159,7 @@ const BuyerDashboard = () => {
           {/* My Orders Tab */}
           <TabsContent value="orders" className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Order History</h3>
+              <h3 className="text-lg font-semibold mb-4">My History</h3>
               {myOrders.length > 0 ? (
                 <div className="space-y-3">
                   {myOrders.map(order => (

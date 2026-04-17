@@ -129,7 +129,7 @@ const Dashboard = () => {
         ? { ...o, status: "ACCEPTED" as const }
         : o
     ));
-    alert("Offer accepted! Customer has 2 hours to complete the rental.");
+    alert("Offer accepted! Customer will be contacted shortly to complete the rental.");
   };
 
   const handleRejectOffer = (offerId: string) => {

@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, AlertCircle, CheckCircle, Phone, Eye, Zap } from "lucide-react";
+import { Clock, AlertCircle, CheckCircle, MessageSquare, Eye, Zap } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { myRentals } from "@/lib/mockData";
 
@@ -225,9 +225,9 @@ const MyRentals = () => {
                           size="sm"
                           variant="outline"
                           className="w-full flex items-center gap-2"
-                          onClick={() => alert("Contact owner feature coming soon")}
+                          onClick={() => alert("Chat feature coming soon")}
                         >
-                          <Phone className="h-4 w-4" /> Contact Owner
+                          <MessageSquare className="h-4 w-4" /> Chat with Owner
                         </Button>
                         {rental.status === "BORROWED" && (
                           <Button
