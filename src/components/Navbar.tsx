@@ -33,7 +33,7 @@ export function Navbar() {
       return [
         { label: "Browse", href: "/browse", icon: ShoppingBag },
         { label: "My Rentals", href: "/my-rentals", icon: Package },
-        { label: "My Orders", href: "/my-orders", icon: LayoutDashboard },
+        { label: "My History", href: "/my-orders", icon: LayoutDashboard },
         { label: "Requests", href: "/requests", icon: Bell },
         { label: "Wishlist", href: "/wishlist", icon: Heart },
       ];

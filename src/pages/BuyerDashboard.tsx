@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
-import { Package, ShoppingBag, Bell, Heart, Star } from "lucide-react";
+import { Package, ShoppingBag, Bell, Heart, Star, MessageSquare } from "lucide-react";
 import { myRentals, tools } from "@/lib/mockData";
 
 const BuyerDashboard = () => {
@@ -139,7 +139,9 @@ const BuyerDashboard = () => {
                           </div>
                           <div className="flex flex-col gap-2 sm:items-end">
                             <Button size="sm">View Details</Button>
-                            <Button size="sm" variant="outline">Contact Owner</Button>
+                            <Button size="sm" variant="outline" className="flex items-center gap-2">
+                              <MessageSquare className="h-4 w-4" /> Chat
+                            </Button>
                           </div>
                         </div>
                       </CardContent>
