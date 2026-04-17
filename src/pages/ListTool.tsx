@@ -40,6 +40,7 @@ const ListTool = () => {
   });
 
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [manualFile, setManualFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -118,6 +119,10 @@ const ListTool = () => {
       newErrors.category = "Category is required";
     }
 
+    if (selectedCategory === "Other" && !customCategory.trim()) {
+      newErrors.category = "Please enter a custom category";
+    }
+
     if (!formData.subcategory) {
       newErrors.subcategory = "Subcategory is required";
     }
@@ -163,6 +168,9 @@ const ListTool = () => {
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
+    if (value !== "Other") {
+      setCustomCategory("");
+    }
     setFormData(prev => ({
       ...prev,
       category: value,
@@ -338,6 +346,7 @@ const ListTool = () => {
               >
                 <option value="">Select category</option>
                 {categories.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                <option value="Other">Other</option>
               </select>
               {errors.category && (
                 <p className="text-xs text-red-500 flex items-center gap-1">
@@ -367,6 +376,28 @@ const ListTool = () => {
               )}
             </div>
           </div>
+
+          {/* Custom Category Input - Only show if "Other" is selected */}
+          {selectedCategory === "Other" && (
+            <div className="space-y-2">
+              <label className="text-sm font-semibold flex items-center gap-1">
+                Custom Category
+                <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="text"
+                placeholder="e.g., Heavy Machinery, Electronics, etc."
+                value={customCategory}
+                onChange={(e) => setCustomCategory(e.target.value)}
+                className={errors.category ? "border-red-500" : ""}
+              />
+              {errors.category && (
+                <p className="text-xs text-red-500 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" /> {errors.category}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Price & Deposit */}
           <div className="grid gap-4 sm:grid-cols-2">
