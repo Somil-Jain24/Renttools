@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { tools, negotiatedOffers } from "@/lib/mockData";
-import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle, AlertCircle, Edit2 } from "lucide-react";
+import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle, AlertCircle, Edit2, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { createOffer } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +29,7 @@ const ToolDetails = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [demoRequestMessage, setDemoRequestMessage] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Check if current user is the owner of this tool
   const isOwner = currentUser && tool && currentUser.id === tool.owner.id;
@@ -139,11 +140,56 @@ const ToolDetails = () => {
         </Link>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column: Image & Owner */}
+          {/* Left Column: Image Gallery & Owner */}
           <div className="lg:col-span-1 space-y-5">
-            {/* Product Image */}
-            <div className="aspect-[4/3] rounded-2xl bg-muted overflow-hidden border">
-              <img src={tool.images[0]} alt={tool.name} className="h-full w-full object-cover" />
+            {/* Product Image Gallery */}
+            <div className="space-y-3">
+              {/* Main Image */}
+              <div className="aspect-[4/3] rounded-2xl bg-muted overflow-hidden border relative">
+                <img src={tool.images[currentImageIndex]} alt={`${tool.name} - View ${currentImageIndex + 1}`} className="h-full w-full object-cover" />
+
+                {/* Image Navigation Arrows - Only show if multiple images */}
+                {tool.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => (prev === 0 ? tool.images.length - 1 : prev - 1))}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) => (prev === tool.images.length - 1 ? 0 : prev + 1))}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+
+                    {/* Image Counter */}
+                    <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs font-medium">
+                      {currentImageIndex + 1} / {tool.images.length}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Thumbnail Navigation - Only show if multiple images */}
+              {tool.images.length > 1 && (
+                <div className="flex gap-2">
+                  {tool.images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`h-16 w-16 rounded-lg border-2 overflow-hidden transition-colors flex-shrink-0 ${
+                        index === currentImageIndex ? 'border-primary' : 'border-muted'
+                      }`}
+                    >
+                      <img src={image} alt={`${tool.name} - Thumbnail ${index + 1}`} className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Owner Section */}
@@ -168,6 +214,49 @@ const ToolDetails = () => {
                     <Shield className="h-3 w-3" /> ID Verified
                   </span>
                 )}
+              </div>
+            </div>
+
+            {/* Usage Guide Section */}
+            {tool.usageGuide && (
+              <div className="rounded-xl border bg-card p-4 space-y-3">
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" /> Usage Guide
+                </h3>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowGuide(!showGuide)}>
+                    {showGuide ? "Hide" : "View"}
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-xs h-7" onClick={handleDownloadGuide}>
+                    <Download className="h-3 w-3 mr-1" /> Download
+                  </Button>
+                </div>
+                {showGuide && (
+                  <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground whitespace-pre-line max-h-40 overflow-y-auto">
+                    {tool.usageGuide}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Location Section */}
+            <div className="rounded-xl border bg-card p-4 space-y-3">
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-primary" /> Location
+              </h3>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">{tool.location}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7 w-full"
+                  onClick={() => {
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tool.location)}`;
+                    window.open(mapsUrl, "_blank");
+                  }}
+                >
+                  <MapPin className="h-3 w-3 mr-1" /> Get Directions
+                </Button>
               </div>
             </div>
           </div>
@@ -379,78 +468,35 @@ const ToolDetails = () => {
               )}
             </div>
 
-            {/* Usage Guide & Location - Combined Card */}
-            <div className="rounded-xl border bg-card p-4 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Left: Usage Guide */}
-                {tool.usageGuide && (
-                  <div className="space-y-3 pb-4 md:pb-0 md:border-r">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-primary" /> Usage Guide
-                    </h3>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowGuide(!showGuide)}>
-                        {showGuide ? "Hide" : "View"}
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-xs h-7" onClick={handleDownloadGuide}>
-                        <Download className="h-3 w-3 mr-1" /> Download
-                      </Button>
-                    </div>
-                    {showGuide && (
-                      <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground whitespace-pre-line max-h-40 overflow-y-auto">
-                        {tool.usageGuide}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Right: Location */}
-                <div className="space-y-2 md:pl-4">
-                  {/* Header: Title + Button */}
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary" /> Location
-                    </h3>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs h-7"
-                      onClick={() => {
-                        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tool.location)}`;
-                        window.open(mapsUrl, "_blank");
-                      }}
-                    >
-                      <MapPin className="h-3 w-3 mr-1" /> Get Directions
-                    </Button>
-                  </div>
-                  {/* Address */}
-                  <p className="text-sm text-muted-foreground">{tool.location}</p>
-                </div>
-              </div>
-            </div>
-
             {/* Product Reviews Section */}
             {tool.productReviews && tool.productReviews.length > 0 && (
               <div className="rounded-xl border bg-card p-4 space-y-4">
-                <h3 className="text-sm font-semibold flex items-center gap-2">
-                  <Star className="h-4 w-4 text-primary fill-primary" /> Product Reviews
-                </h3>
-                <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                    <Star className="h-4 w-4 text-primary fill-primary" /> Product Reviews
+                  </h3>
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
+                    {tool.productReviews.length} review{tool.productReviews.length > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="space-y-4">
                   {tool.productReviews.map((review) => (
-                    <div key={review.id} className="border-t pt-3 first:border-t-0 first:pt-0">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div>
-                          <p className="text-sm font-medium">{review.reviewerName}</p>
-                          <div className="flex items-center gap-1 mt-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-3 w-3 ${i < Math.round(review.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
-                              />
-                            ))}
+                    <div key={review.id} className="border rounded-lg p-3 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-medium">{review.reviewerName}</p>
+                            <div className="flex items-center gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3.5 w-3.5 ${i < Math.round(review.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                                />
+                              ))}
+                            </div>
                           </div>
+                          <p className="text-xs text-muted-foreground">{new Date(review.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <p className="text-xs text-muted-foreground">{new Date(review.createdAt).toLocaleDateString()}</p>
                       </div>
                       <p className="text-sm text-muted-foreground">{review.comment}</p>
                     </div>

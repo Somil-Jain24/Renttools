@@ -225,7 +225,7 @@ export const borrowers: ToolOwner[] = [
 export const tools: Tool[] = [
   {
     id: "t1", name: "Bosch Impact Drill", description: "Professional-grade impact drill perfect for concrete and masonry work. Comes with a set of drill bits.", pricePerDay: 150, deposit: 500, category: "Power Tools", subcategory: "Drill",
-    images: ["https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&h=400&fit=crop"],
+    images: ["https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1586864387935-fc5fcd6b2d44?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1559056199-641a0ac8b8d5?w=600&h=400&fit=crop"],
     owner: owners[0], distance: 1.2, available: true, location: "Vijay Nagar, Indore",
     usageGuide: "1. Insert the correct drill bit for your material (masonry bit for concrete, wood bit for wood).\n2. Set the torque level — use high for concrete, medium for wood.\n3. Hold the drill firmly with both hands.\n4. Start at slow speed, then increase gradually.\n5. Do NOT force the drill — let the bit do the work.\n6. Wear safety goggles and ear protection.\n7. After use, remove the bit and wipe down the chuck.",
     productReviews: [
@@ -235,11 +235,12 @@ export const tools: Tool[] = [
   },
   {
     id: "t2", name: "6ft Aluminium Ladder", description: "Sturdy aluminium step ladder, great for painting and ceiling work.", pricePerDay: 80, deposit: 300, category: "Ladders", subcategory: "Step Ladder",
-    images: ["https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&h=400&fit=crop"],
+    images: ["https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1632923057155-1709362a2f04?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1565934250335-2d0e2e53e4ef?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1552631881-3b63ba6b5d81?w=600&h=400&fit=crop"],
     owner: owners[1], distance: 2.5, available: true, location: "Bhanwarkunj, Indore",
     usageGuide: "1. Open the ladder fully and lock the spreader bars.\n2. Place on flat, stable ground only.\n3. Never stand on the top two steps.\n4. Maintain 3 points of contact at all times.\n5. Do not lean to the side — reposition the ladder instead.\n6. Max weight capacity: 120 kg.",
     productReviews: [
       { id: "pr3", toolId: "t2", reviewerName: "Priya S.", rating: 5, comment: "Very sturdy and reliable. Best ladder I've rented!", createdAt: "2026-03-20" },
+      { id: "pr4", toolId: "t2", reviewerName: "Rajesh K.", rating: 5, comment: "Perfect for my painting project. Very stable and lightweight.", createdAt: "2026-03-18" },
     ],
   },
   {
@@ -249,14 +250,22 @@ export const tools: Tool[] = [
   },
   {
     id: "t4", name: "Bosch Circular Saw", description: "Powerful circular saw for woodworking projects.", pricePerDay: 200, deposit: 800, category: "Power Tools", subcategory: "Saw",
-    images: ["https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=600&h=400&fit=crop"],
+    images: ["https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1530124566582-a45a7c78ec43?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=400&fit=crop"],
     owner: owners[3], distance: 0.8, available: true, location: "MG Road, Indore",
     usageGuide: "1. Clamp the workpiece securely before cutting.\n2. Set the blade depth to 5mm more than material thickness.\n3. Wait for full blade speed before starting the cut.\n4. Follow the guide line, do not twist the blade.\n5. Let the blade stop completely before lifting.\n6. Always wear safety goggles and hearing protection.",
+    productReviews: [
+      { id: "pr5", toolId: "t4", reviewerName: "Suresh M.", rating: 5, comment: "Amazing saw! Cuts through wood like butter. Very precise.", createdAt: "2026-03-12" },
+      { id: "pr6", toolId: "t4", reviewerName: "Neha D.", rating: 4, comment: "Great tool for woodworking. Motor is quite powerful.", createdAt: "2026-02-25" },
+    ],
   },
   {
     id: "t5", name: "Stanley Toolkit (65 pcs)", description: "Complete hand tool kit with wrenches, screwdrivers, pliers and more.", pricePerDay: 100, deposit: 400, category: "Hand Tools", subcategory: "Toolkit",
-    images: ["https://images.unsplash.com/photo-1581147036324-c17ac41f3e6a?w=600&h=400&fit=crop"],
+    images: ["https://images.unsplash.com/photo-1581147036324-c17ac41f3e6a?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1530124566582-a45a7c78ec43?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1609408059192-e2f7e9c70a47?w=600&h=400&fit=crop", "https://images.unsplash.com/photo-1578926078328-123456789012?w=600&h=400&fit=crop"],
     owner: owners[0], distance: 1.5, available: true, location: "Vijay Nagar, Indore",
+    productReviews: [
+      { id: "pr7", toolId: "t5", reviewerName: "Rohan P.", rating: 5, comment: "Excellent toolkit! All tools are high quality and well-organized.", createdAt: "2026-03-10" },
+      { id: "pr8", toolId: "t5", reviewerName: "Maya S.", rating: 4, comment: "Very comprehensive set. Perfect for home repairs.", createdAt: "2026-02-20" },
+    ],
   },
   {
     id: "t6", name: "Makita Angle Grinder", description: "Heavy-duty angle grinder for cutting and grinding metal.", pricePerDay: 180, deposit: 600, category: "Power Tools", subcategory: "Grinder",
