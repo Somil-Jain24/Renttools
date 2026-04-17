@@ -39,10 +39,6 @@ const SellerDashboard = () => {
   ];
 
 
-  const earningsData = {
-    totalRentals: 47,
-  };
-
   const activeRentals = [
     {
       id: "rental-1",
@@ -153,19 +149,6 @@ const SellerDashboard = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Stats Cards - Keep Total Rentals */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card className="border-border/60">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Rentals</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{earningsData.totalRentals}</p>
-              <p className="text-xs text-muted-foreground mt-1">All time</p>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Trust Score Card */}
         <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/5 to-success/5">
