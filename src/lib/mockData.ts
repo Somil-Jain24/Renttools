@@ -1,3 +1,12 @@
+export interface ProductReview {
+  id: string;
+  toolId: string;
+  reviewerName: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 export interface Tool {
   id: string;
   name: string;
@@ -12,6 +21,7 @@ export interface Tool {
   available: boolean;
   location: string;
   usageGuide?: string;
+  productReviews?: ProductReview[];
 }
 
 export interface ToolOwner {
@@ -217,12 +227,19 @@ export const tools: Tool[] = [
     images: ["https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&h=400&fit=crop"],
     owner: owners[0], distance: 1.2, available: true, location: "Vijay Nagar, Indore",
     usageGuide: "1. Insert the correct drill bit for your material (masonry bit for concrete, wood bit for wood).\n2. Set the torque level — use high for concrete, medium for wood.\n3. Hold the drill firmly with both hands.\n4. Start at slow speed, then increase gradually.\n5. Do NOT force the drill — let the bit do the work.\n6. Wear safety goggles and ear protection.\n7. After use, remove the bit and wipe down the chuck.",
+    productReviews: [
+      { id: "pr1", toolId: "t1", reviewerName: "Vikram J.", rating: 5, comment: "Excellent drill! Very powerful and durable. Perfect for my construction work.", createdAt: "2026-03-15" },
+      { id: "pr2", toolId: "t1", reviewerName: "Ananya G.", rating: 4, comment: "Great tool, works smoothly. The speed control is very helpful.", createdAt: "2026-02-28" },
+    ],
   },
   {
     id: "t2", name: "6ft Aluminium Ladder", description: "Sturdy aluminium step ladder, great for painting and ceiling work.", pricePerDay: 80, deposit: 300, category: "Ladders", subcategory: "Step Ladder",
     images: ["https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&h=400&fit=crop"],
     owner: owners[1], distance: 2.5, available: true, location: "Bhanwarkunj, Indore",
     usageGuide: "1. Open the ladder fully and lock the spreader bars.\n2. Place on flat, stable ground only.\n3. Never stand on the top two steps.\n4. Maintain 3 points of contact at all times.\n5. Do not lean to the side — reposition the ladder instead.\n6. Max weight capacity: 120 kg.",
+    productReviews: [
+      { id: "pr3", toolId: "t2", reviewerName: "Priya S.", rating: 5, comment: "Very sturdy and reliable. Best ladder I've rented!", createdAt: "2026-03-20" },
+    ],
   },
   {
     id: "t3", name: "Karcher Pressure Washer", description: "High-pressure washer for cleaning cars, driveways, and patios.", pricePerDay: 250, deposit: 1000, category: "Cleaning", subcategory: "Pressure Washer",
