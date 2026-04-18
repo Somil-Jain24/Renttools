@@ -166,10 +166,10 @@ const BrowseTools = () => {
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center bg-secondary/80 rounded-xl p-1 border border-border/60">
               {currentUser && (
-                <Button variant={sortBy === "connections" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("connections")} className={`rounded-lg text-xs ${sortBy === "connections" ? "bg-card shadow-soft" : ""}`}>Your Network</Button>
+                <Button variant={sortBy === "connections" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("connections")} className={`rounded-lg text-xs ${sortBy === "connections" ? "bg-card shadow-soft text-foreground" : ""}`}>Your Network</Button>
               )}
-              <Button variant={sortBy === "nearest" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("nearest")} className={`rounded-lg text-xs ${sortBy === "nearest" ? "bg-card shadow-soft" : ""}`}>Nearest</Button>
-              <Button variant={sortBy === "cheapest" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("cheapest")} className={`rounded-lg text-xs ${sortBy === "cheapest" ? "bg-card shadow-soft" : ""}`}>Cheapest</Button>
+              <Button variant={sortBy === "nearest" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("nearest")} className={`rounded-lg text-xs ${sortBy === "nearest" ? "bg-card shadow-soft text-foreground" : ""}`}>Nearest</Button>
+              <Button variant={sortBy === "cheapest" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("cheapest")} className={`rounded-lg text-xs ${sortBy === "cheapest" ? "bg-card shadow-soft text-foreground" : ""}`}>Cheapest</Button>
             </div>
             <Button variant="outline" size="sm" className="md:hidden rounded-xl border-border/60" onClick={() => setShowFilters(!showFilters)}>
               {showFilters ? <X className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
