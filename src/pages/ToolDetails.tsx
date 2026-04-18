@@ -583,6 +583,61 @@ const ToolDetails = () => {
                 </div>
               </div>
             )}
+
+            {/* Recommendations Section */}
+            {(() => {
+              const similarTools = tools.filter(
+                t => t.category === tool.category && t.id !== tool.id
+              ).slice(0, 5);
+
+              if (similarTools.length === 0) return null;
+
+              return (
+                <div className="rounded-xl border bg-card p-4 space-y-4">
+                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                    🔗 Similar Products
+                  </h3>
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    {similarTools.map((similarTool) => (
+                      <Link
+                        key={similarTool.id}
+                        to={`/tools/${similarTool.id}`}
+                        className="block rounded-lg border border-border/60 bg-secondary/30 hover:bg-secondary/60 transition-colors p-3 space-y-2 group"
+                      >
+                        <div className="flex gap-3">
+                          <div className="h-20 w-20 rounded-lg bg-muted overflow-hidden flex-shrink-0">
+                            <img
+                              src={similarTool.images[0]}
+                              alt={similarTool.name}
+                              className="h-full w-full object-cover group-hover:scale-110 transition-transform"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                              {similarTool.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {similarTool.description}
+                            </p>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-sm font-semibold text-primary">
+                                ₹{similarTool.pricePerDay}/day
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <StarRating score={similarTool.owner.trustScore} showScore={false} />
+                                <span className="text-xs text-muted-foreground">
+                                  {similarTool.distance} km
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
