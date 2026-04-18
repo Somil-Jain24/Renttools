@@ -2,6 +2,7 @@ import { CheckCircle, AlertTriangle, XCircle, Image as ImageIcon } from "lucide-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ConditionRecord } from "@/lib/mockData";
+import { compareConditions } from "@/lib/mockData";
 
 interface ConditionLogProps {
   pickupCondition?: ConditionRecord;
@@ -132,9 +133,34 @@ export const ConditionLog = ({
       {/* Comparison & Deduction Summary */}
       {pickupCondition && returnCondition && (
         <Card className="border-2 border-blue-200 bg-blue-50 p-4 dark:border-blue-700 dark:bg-blue-950">
-          <h3 className="mb-4 font-semibold text-blue-900 dark:text-blue-100">Condition Comparison & Deposit Summary</h3>
+          <h3 className="mb-4 font-semibold text-blue-900 dark:text-blue-100">⚖️ Condition Comparison & Deposit Summary</h3>
 
           <div className="space-y-3">
+            {/* Damage Analysis */}
+            {(() => {
+              const { newDamageDetected, damageAnalysis } = compareConditions(pickupCondition, returnCondition);
+              return (
+                <div className={`rounded-lg p-3 ${
+                  newDamageDetected
+                    ? "border border-orange-300 bg-orange-100/50 dark:border-orange-700 dark:bg-orange-950/40"
+                    : "border border-green-300 bg-green-100/50 dark:border-green-700 dark:bg-green-950/40"
+                }`}>
+                  <p className={`text-xs font-semibold ${
+                    newDamageDetected ? "text-orange-900 dark:text-orange-200" : "text-green-900 dark:text-green-200"
+                  }`}>
+                    {newDamageDetected ? "🚨 Damage Detected" : "✓ No New Damage Detected"}
+                  </p>
+                  {damageAnalysis && (
+                    <p className={`text-xs mt-1 ${
+                      newDamageDetected ? "text-orange-800 dark:text-orange-300" : "text-green-800 dark:text-green-300"
+                    }`}>
+                      {damageAnalysis}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
             <div className="flex items-center justify-between rounded-lg bg-white p-3 dark:bg-slate-900">
               <span className="text-sm">Pickup Condition:</span>
               <span className="font-semibold capitalize">{pickupCondition.status}</span>

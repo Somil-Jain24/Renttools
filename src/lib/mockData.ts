@@ -103,6 +103,36 @@ export interface Rental {
   depositRefundAmount?: number; // calculated amount to be refunded after deductions
 }
 
+// Helper function to compare conditions and detect new damage
+export const compareConditions = (pickupCondition?: ConditionRecord, returnCondition?: ConditionRecord) => {
+  if (!pickupCondition || !returnCondition) {
+    return { newDamageDetected: false, damageAnalysis: "" };
+  }
+
+  const pickupGood = pickupCondition.status === "GOOD";
+  const returnGood = returnCondition.status === "GOOD";
+  const pickupLevel = pickupCondition.damageLevel || "NONE";
+  const returnLevel = returnCondition.damageLevel || "NONE";
+
+  let newDamageDetected = false;
+  let damageAnalysis = "";
+
+  if (pickupGood && !returnGood) {
+    newDamageDetected = true;
+    damageAnalysis = `Item was in good condition at pickup but has ${returnLevel.toLowerCase()} damage at return.`;
+  } else if (!pickupGood && !returnGood) {
+    if (returnLevel === "MAJOR" && pickupLevel !== "MAJOR") {
+      newDamageDetected = true;
+      damageAnalysis = `Damage severity increased from ${pickupLevel.toLowerCase()} to ${returnLevel.toLowerCase()}.`;
+    } else if (returnLevel === "MINOR" && pickupLevel === "NONE") {
+      newDamageDetected = true;
+      damageAnalysis = `Item had pre-existing damage at pickup (${pickupLevel.toLowerCase()}) and additional ${returnLevel.toLowerCase()} damage found at return.`;
+    }
+  }
+
+  return { newDamageDetected, damageAnalysis };
+};
+
 export interface NegotiatedOffer {
   id: string;
   toolId: string;
@@ -385,21 +415,56 @@ export const tools: Tool[] = [
 export const myRentals: Rental[] = [
   // Active rentals
   { id: "r1", tool: tools[0], status: "BORROWED", depositStatus: "LOCKED", startDate: "2026-04-10", endDate: "2026-04-14", totalPrice: 600, amountDeposited: 500,
+    borrower: borrowers[0],
+    pickupCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-04-10 11:30", recordedBy: "current-user-id", recordedByName: "You" },
+    pickupConditionPending: false,
     chatMessages: [
       { id: "m1", senderId: "u1", senderName: "Rahul Sharma", text: "Hi! Your request is approved. You can pick up the drill tomorrow.", timestamp: "2026-04-09 10:30" },
       { id: "m2", senderId: "me", senderName: "You", text: "Great! I'll come by around 11 AM.", timestamp: "2026-04-09 10:45" },
       { id: "m3", senderId: "u1", senderName: "Rahul Sharma", text: "Perfect, see you then!", timestamp: "2026-04-09 11:00" },
     ],
   },
-  { id: "r3", tool: tools[4], status: "REQUESTED", depositStatus: "LOCKED", startDate: "2026-04-15", endDate: "2026-04-17", totalPrice: 200, amountDeposited: 400 },
-  { id: "r4", tool: tools[3], status: "APPROVED", depositStatus: "LOCKED", startDate: "2026-04-20", endDate: "2026-04-23", totalPrice: 600, amountDeposited: 800 },
+  { id: "r3", tool: tools[4], status: "REQUESTED", depositStatus: "LOCKED", startDate: "2026-04-15", endDate: "2026-04-17", totalPrice: 200, amountDeposited: 400, borrower: borrowers[0] },
+  { id: "r4", tool: tools[3], status: "APPROVED", depositStatus: "LOCKED", startDate: "2026-04-20", endDate: "2026-04-23", totalPrice: 600, amountDeposited: 800, borrower: borrowers[1] },
 
   // Past rentals
-  { id: "r2", tool: tools[1], status: "RETURNED", depositStatus: "LOCKED", startDate: "2026-04-01", endDate: "2026-04-03", totalPrice: 160, amountDeposited: 300 },
-  { id: "r5", tool: tools[6], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-28", endDate: "2026-03-30", totalPrice: 120, amountDeposited: 200 },
-  { id: "r6", tool: tools[9], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-20", endDate: "2026-03-22", totalPrice: 100, amountDeposited: 150 },
-  { id: "r7", tool: tools[2], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-10", endDate: "2026-03-13", totalPrice: 750, amountDeposited: 1000 },
-  { id: "r8", tool: tools[7], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-02-28", endDate: "2026-03-03", totalPrice: 1200, amountDeposited: 1500 },
+  { id: "r2", tool: tools[1], status: "RETURNED", depositStatus: "LOCKED", startDate: "2026-04-01", endDate: "2026-04-03", totalPrice: 160, amountDeposited: 300, borrower: borrowers[0],
+    pickupCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-04-01 10:00", recordedBy: "current-user-id", recordedByName: "You" },
+    pickupConditionPending: false,
+    returnConditionPending: true,
+  },
+  { id: "r5", tool: tools[6], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-28", endDate: "2026-03-30", totalPrice: 120, amountDeposited: 200, borrower: borrowers[1],
+    pickupCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-03-28 14:00", recordedBy: "current-user-id", recordedByName: "You" },
+    pickupConditionPending: false,
+    returnCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-03-30 16:00", recordedBy: "u3", recordedByName: "Amit Singh" },
+    returnConditionPending: false,
+    depositDeduction: { percentage: 0, recordedAt: "2026-03-30 16:00", recordedBy: "u3" },
+    depositRefundAmount: 200,
+  },
+  { id: "r6", tool: tools[9], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-20", endDate: "2026-03-22", totalPrice: 100, amountDeposited: 150, borrower: borrowers[0],
+    pickupCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-03-20 09:00", recordedBy: "current-user-id", recordedByName: "You" },
+    pickupConditionPending: false,
+    returnCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-03-22 17:00", recordedBy: "u1", recordedByName: "Rahul Sharma" },
+    returnConditionPending: false,
+    depositDeduction: { percentage: 0, recordedAt: "2026-03-22 17:00", recordedBy: "u1" },
+    depositRefundAmount: 150,
+  },
+  { id: "r7", tool: tools[2], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-03-10", endDate: "2026-03-13", totalPrice: 750, amountDeposited: 1000, borrower: borrowers[1],
+    pickupCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-03-10 11:00", recordedBy: "current-user-id", recordedByName: "You" },
+    pickupConditionPending: false,
+    returnCondition: { status: "DAMAGED", damageLevel: "MINOR", description: "Small dent on the housing", images: [], timestamp: "2026-03-13 14:00", recordedBy: "u2", recordedByName: "Priya Patel" },
+    returnConditionPending: false,
+    depositDeduction: { percentage: 10, reason: "Minor damage - small dent on housing", recordedAt: "2026-03-13 14:00", recordedBy: "u2" },
+    depositRefundAmount: 900,
+  },
+  { id: "r8", tool: tools[7], status: "RETURNED", depositStatus: "RELEASED", startDate: "2026-02-28", endDate: "2026-03-03", totalPrice: 1200, amountDeposited: 1500, borrower: borrowers[0],
+    pickupCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-02-28 10:00", recordedBy: "current-user-id", recordedByName: "You" },
+    pickupConditionPending: false,
+    returnCondition: { status: "GOOD", damageLevel: "NONE", images: [], timestamp: "2026-03-03 15:00", recordedBy: "u4", recordedByName: "Sneha Reddy" },
+    returnConditionPending: false,
+    depositDeduction: { percentage: 0, recordedAt: "2026-03-03 15:00", recordedBy: "u4" },
+    depositRefundAmount: 1500,
+  },
 ];
 
 export const myListings: Rental[] = [

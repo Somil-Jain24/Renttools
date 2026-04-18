@@ -4,10 +4,12 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/context/UserContext";
-import { ShoppingBag, Bell, Star, AlertCircle, CheckCircle, ArrowRight, Eye } from "lucide-react";
+import { ShoppingBag, Bell, Star, AlertCircle, CheckCircle, ArrowRight, Eye, Package } from "lucide-react";
 import { ReturnConditionCheck } from "@/components/ReturnConditionCheck";
-import type { ConditionRecord, DepositDeduction } from "@/lib/mockData";
+import { myRentals } from "@/lib/mockData";
+import type { ConditionRecord, DepositDeduction, Rental } from "@/lib/mockData";
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
@@ -20,15 +22,32 @@ const SellerDashboard = () => {
       selectedRentalForReturn.returnCondition = conditionRecord;
       selectedRentalForReturn.returnConditionPending = false;
       selectedRentalForReturn.depositDeduction = deduction;
-      const depositAmount = 5000; // Mock value - would come from rental
-      selectedRentalForReturn.depositRefundAmount = depositAmount - Math.round((deduction.percentage / 100) * depositAmount);
-      alert(`✓ Return verified! Deposit refund: ₹${selectedRentalForReturn.depositRefundAmount}`);
+      selectedRentalForReturn.depositStatus = deduction.percentage > 0 ? "DEDUCTED" : "RELEASED";
+
+      // Calculate refund based on actual deposit amount
+      const depositAmount = selectedRentalForReturn.amountDeposited || 0;
+      const deductedAmount = Math.round((deduction.percentage / 100) * depositAmount);
+      selectedRentalForReturn.depositRefundAmount = depositAmount - deductedAmount;
+
+      alert(
+        `✓ Return verified!\n\nDeposit: ₹${depositAmount}\nDeduction (${deduction.percentage}%): ₹${deductedAmount}\nRefund to Buyer: ₹${selectedRentalForReturn.depositRefundAmount}`
+      );
       setReturnCheckDialogOpen(false);
       setSelectedRentalForReturn(null);
     }
   };
 
-  // Mock data for seller
+  // Get real rentals - currently borrowed items and items awaiting return verification
+  const activeRentals = myRentals.filter(rental =>
+    rental.status === "BORROWED" || (rental.status === "RETURNED" && rental.returnConditionPending)
+  );
+
+  // Items awaiting return verification (most urgent)
+  const pendingReturnVerifications = activeRentals.filter(r =>
+    r.status === "RETURNED" && r.returnConditionPending
+  );
+
+  // Mock data for seller listings
   const myListings = [
     {
       id: "list-1",
@@ -57,39 +76,19 @@ const SellerDashboard = () => {
   ];
 
 
-  const activeRentals = [
-    {
-      id: "rental-1",
-      toolName: "Cordless Drill",
-      buyerName: "John Doe",
-      rentalStartDate: "2025-01-15",
-      expectedReturnDate: "2025-01-20",
-      status: "Active",
-      daysLeft: 2,
-    },
-    {
-      id: "rental-2",
-      toolName: "Extension Ladder",
-      buyerName: "Sarah Smith",
-      rentalStartDate: "2025-01-18",
-      expectedReturnDate: "2025-01-22",
-      status: "Active",
-      daysLeft: 4,
-    },
-    {
-      id: "rental-3",
-      toolName: "Power Drill",
-      buyerName: "Mike Johnson",
-      rentalStartDate: "2025-01-10",
-      expectedReturnDate: "2025-01-19",
-      status: "Active",
-      daysLeft: 1,
-    },
-  ];
-
-
   // Action items for seller
   const actionItems = [
+    ...(pendingReturnVerifications.length > 0 ? [
+      {
+        id: "action-return",
+        type: "pending-return" as const,
+        title: `${pendingReturnVerifications.length} Item${pendingReturnVerifications.length > 1 ? 's' : ''} Awaiting Return Verification`,
+        description: "You need to verify items that buyers have returned",
+        icon: Package,
+        priority: "high" as const,
+        cta: { label: "Verify Returns", href: "#pending-returns" },
+      },
+    ] : []),
     {
       id: "action-1",
       type: "pending-request" as const,
@@ -129,58 +128,118 @@ const SellerDashboard = () => {
           <p className="text-muted-foreground">Manage your listings, requests, and earnings</p>
         </div>
 
-        {/* Active Rentals Section */}
+        {/* Active & Pending Return Verification Section */}
         <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/5 to-blue/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShoppingBag className="h-5 w-5 text-primary" />
-              Active Rentals
+              Active Rentals & Returns
             </CardTitle>
-            <CardDescription>Tools currently rented out to buyers</CardDescription>
+            <CardDescription>Tools rented out to buyers and items awaiting verification</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-6">
-              <div className="text-4xl font-bold text-primary">{activeRentals.length}</div>
-              <p className="text-sm text-muted-foreground mt-1">Tools currently rented</p>
+            <div className="mb-6 grid grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Currently Rented</p>
+                <div className="text-3xl font-bold text-primary">
+                  {activeRentals.filter(r => r.status === "BORROWED").length}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Awaiting Verification</p>
+                <div className="text-3xl font-bold text-destructive">
+                  {pendingReturnVerifications.length}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Total Active</p>
+                <div className="text-3xl font-bold">
+                  {activeRentals.length}
+                </div>
+              </div>
             </div>
-            <div className="space-y-3">
-              {activeRentals.map(rental => (
-                <div key={rental.id} className="border border-border/60 rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm mb-1">{rental.toolName}</h4>
-                      <p className="text-xs text-muted-foreground mb-2">Rented by: <span className="font-medium text-foreground">{rental.buyerName}</span></p>
-                      <p className="text-xs text-muted-foreground">Rental Period: {rental.rentalStartDate} → {rental.expectedReturnDate}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-success">{rental.daysLeft}</p>
-                          <p className="text-xs text-muted-foreground">days left</p>
+
+            {activeRentals.length === 0 ? (
+              <div className="text-center py-8">
+                <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                <p className="text-sm text-muted-foreground">No active rentals or pending verifications</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* Pending Return Verifications - High Priority */}
+                {pendingReturnVerifications.length > 0 && (
+                  <div id="pending-returns" className="mb-4 p-4 rounded-lg border-2 border-destructive/50 bg-destructive/5">
+                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-destructive" />
+                      Return Verifications Required
+                    </h4>
+                    <div className="space-y-3">
+                      {pendingReturnVerifications.map(rental => (
+                        <div key={rental.id} className="border border-destructive/30 rounded-lg p-3 bg-white dark:bg-slate-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="flex-1">
+                            <h5 className="font-semibold text-sm">{rental.tool.name}</h5>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Buyer: <span className="font-medium text-foreground">{rental.borrower?.name || "Unknown"}</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Period: {rental.startDate} → {rental.endDate}
+                            </p>
+                            {rental.amountDeposited && (
+                              <p className="text-xs font-semibold text-destructive mt-1">
+                                Security Deposit: ₹{rental.amountDeposited}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <Badge variant="destructive">Pending Verification</Badge>
+                            <Button
+                              size="sm"
+                              className="whitespace-nowrap"
+                              onClick={() => {
+                                setSelectedRentalForReturn(rental);
+                                setReturnCheckDialogOpen(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Verify Return
+                            </Button>
+                          </div>
                         </div>
-                        <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 text-xs font-medium">
-                          {rental.status}
-                        </div>
-                      </div>
-                      {rental.status === "Active" && rental.daysLeft === 0 && (
-                        <Button
-                          size="xs"
-                          variant="outline"
-                          className="text-xs h-7"
-                          onClick={() => {
-                            setSelectedRentalForReturn(rental);
-                            setReturnCheckDialogOpen(true);
-                          }}
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          Verify Return
-                        </Button>
-                      )}
+                      ))}
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+
+                {/* Currently Borrowed Rentals */}
+                {activeRentals.filter(r => r.status === "BORROWED").length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-sm mb-3">Currently Rented Out</h4>
+                    <div className="space-y-3">
+                      {activeRentals.filter(r => r.status === "BORROWED").map(rental => (
+                        <div key={rental.id} className="border border-border/60 rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex-1">
+                              <h5 className="font-semibold text-sm">{rental.tool.name}</h5>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Rented by: <span className="font-medium text-foreground">{rental.borrower?.name || "Unknown"}</span>
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                Period: {rental.startDate} → {rental.endDate}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300">
+                                Active Rental
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -341,9 +400,9 @@ const SellerDashboard = () => {
         <ReturnConditionCheck
           rentalId={selectedRentalForReturn.id}
           ownerName={currentUser?.name || "Owner"}
-          borrowerName={selectedRentalForReturn.buyerName}
-          toolName={selectedRentalForReturn.toolName}
-          depositAmount={5000} // Mock value - would come from rental data
+          borrowerName={selectedRentalForReturn.borrower?.name || "Buyer"}
+          toolName={selectedRentalForReturn.tool.name}
+          depositAmount={selectedRentalForReturn.amountDeposited || 0}
           onSubmit={handleReturnConditionSubmit}
           onCancel={() => {
             setReturnCheckDialogOpen(false);
