@@ -10,6 +10,8 @@ import { useUser } from "@/context/UserContext";
 import { myRentals, Rental, ConditionRecord } from "@/lib/mockData";
 import { ExtendRentalDialog } from "@/components/ExtendRentalDialog";
 import { PickupConditionCheck } from "@/components/PickupConditionCheck";
+import { DepositStatusCard } from "@/components/DepositStatusCard";
+import { ConditionStatusBadge } from "@/components/ConditionStatusBadge";
 
 const MyRentals = () => {
   const navigate = useNavigate();
@@ -191,13 +193,27 @@ const MyRentals = () => {
                           <span className="text-muted-foreground">Total Amount:</span>
                           <span className="font-semibold">₹{rental.totalPrice}</span>
                         </div>
-                        {rental.status === "BORROWED" && rental.amountDeposited && (
+                        {rental.amountDeposited && (
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Security deposit:</span>
+                            <span className="text-muted-foreground">Security Deposit:</span>
                             <span className="font-semibold">₹{rental.amountDeposited}</span>
                           </div>
                         )}
                       </div>
+
+                      {/* Show Deposit Status Card for active rentals */}
+                      {rental.amountDeposited && rental.status === "BORROWED" && rental.pickupCondition && (
+                        <div className="pt-2 mt-2 border-t">
+                          <DepositStatusCard
+                            depositAmount={rental.amountDeposited}
+                            depositStatus={rental.depositStatus}
+                            deductionPercent={rental.depositDeduction?.percentage}
+                            deductionReason={rental.depositDeduction?.reason}
+                            refundAmount={rental.depositRefundAmount}
+                            showDetails={false}
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Rental Dates & Owner */}
@@ -218,6 +234,16 @@ const MyRentals = () => {
                           </span>
                         </div>
                       </div>
+
+                      {/* Condition Status */}
+                      <div className="border-t pt-3">
+                        <ConditionStatusBadge
+                          pickupCondition={rental.pickupCondition}
+                          returnCondition={rental.returnCondition}
+                          pickupPending={rental.pickupConditionPending}
+                          returnPending={rental.returnConditionPending}
+                        />
+                      </div>
                     </div>
 
                     {/* Status & Actions */}
@@ -228,10 +254,23 @@ const MyRentals = () => {
                           {getStatusLabel(rental.status)}
                         </Badge>
                         <p className="text-xs text-muted-foreground mt-2">
-                          {rental.status === "BORROWED" && "Item currently in use"}
-                          {rental.status === "APPROVED" && "Ready to pick up"}
+                          {rental.status === "BORROWED" && (
+                            <>
+                              {rental.pickupCondition ? "Item currently in use" : "⚠️ Pickup verification pending"}
+                            </>
+                          )}
+                          {rental.status === "APPROVED" && "🔒 Pickup verification required"}
                           {rental.status === "REQUESTED" && "Waiting for owner approval"}
                         </p>
+
+                        {/* Show pickup verification pending alert */}
+                        {rental.status === "APPROVED" && (
+                          <div className="mt-2 p-3 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-800">
+                            <p className="text-xs font-medium text-blue-900 dark:text-blue-200">
+                              ✓ Owner approved! Now verify the item condition before using it.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Actions */}
@@ -264,11 +303,25 @@ const MyRentals = () => {
                               setPickupCheckDialogOpen(true);
                             }}
                           >
-                            <Lock className="h-4 w-4" /> Confirm Pickup
+                            <Lock className="h-4 w-4" /> Verify & Confirm Pickup
                           </Button>
                         )}
                         {rental.status === "BORROWED" && (
                           <>
+                            {/* Show warning if pickup verification is missing */}
+                            {!rental.pickupCondition && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="w-full flex items-center gap-2"
+                                onClick={() => {
+                                  setSelectedRentalForPickup(rental);
+                                  setPickupCheckDialogOpen(true);
+                                }}
+                              >
+                                <AlertCircle className="h-4 w-4" /> ⚠️ Complete Pickup Verification
+                              </Button>
+                            )}
                             <Button
                               size="sm"
                               variant="outline"
@@ -277,6 +330,8 @@ const MyRentals = () => {
                                 setSelectedRentalForExtend(rental);
                                 setExtendDialogOpen(true);
                               }}
+                              disabled={!rental.pickupCondition}
+                              title={!rental.pickupCondition ? "Complete pickup verification first" : ""}
                             >
                               Extend Rental
                             </Button>
@@ -285,6 +340,8 @@ const MyRentals = () => {
                               variant="default"
                               className="w-full flex items-center gap-2"
                               onClick={() => navigate(`/damage-check?rentalId=${rental.id}`)}
+                              disabled={!rental.pickupCondition}
+                              title={!rental.pickupCondition ? "Complete pickup verification first" : ""}
                             >
                               <RotateCcw className="h-4 w-4" /> Return Tool
                             </Button>
