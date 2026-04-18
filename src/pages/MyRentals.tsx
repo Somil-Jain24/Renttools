@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, AlertCircle, CheckCircle, MessageSquare, Eye, Zap } from "lucide-react";
+import { Clock, AlertCircle, CheckCircle, MessageSquare, Eye, Zap, RotateCcw } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { myRentals, Rental } from "@/lib/mockData";
 import { ExtendRentalDialog } from "@/components/ExtendRentalDialog";
@@ -241,17 +241,27 @@ const MyRentals = () => {
                           </Button>
                         )}
                         {rental.status === "BORROWED" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => {
-                              setSelectedRentalForExtend(rental);
-                              setExtendDialogOpen(true);
-                            }}
-                          >
-                            Extend Rental
-                          </Button>
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => {
+                                setSelectedRentalForExtend(rental);
+                                setExtendDialogOpen(true);
+                              }}
+                            >
+                              Extend Rental
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="default"
+                              className="w-full flex items-center gap-2"
+                              onClick={() => navigate(`/damage-check?rentalId=${rental.id}`)}
+                            >
+                              <RotateCcw className="h-4 w-4" /> Return Tool
+                            </Button>
+                          </>
                         )}
                       </div>
                     </div>

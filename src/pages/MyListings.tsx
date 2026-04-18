@@ -79,7 +79,7 @@ const MyListings = () => {
             <h1 className="text-3xl font-bold mb-2">My Listings</h1>
             <p className="text-muted-foreground">Manage your tools and track performance</p>
           </div>
-          <Button size="lg" className="flex items-center gap-2">
+          <Button size="lg" className="flex items-center gap-2" onClick={() => navigate("/list-tool")}>
             <Plus className="h-4 w-4" /> Add New Tool
           </Button>
         </div>
