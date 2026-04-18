@@ -4,14 +4,16 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star, MessageSquare, Archive } from "lucide-react";
+import { Star, MessageSquare, Archive, ChevronDown, ChevronUp } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { myRentals, rentalRatings } from "@/lib/mockData";
+import { ConditionLog } from "@/components/ConditionLog";
 
 const MyOrders = () => {
   const navigate = useNavigate();
   const { currentUser } = useUser();
   const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
+  const [expandedConditionLog, setExpandedConditionLog] = useState<string | null>(null);
 
   // Filter for past rentals only (RETURNED status)
   const pastRentals = myRentals.filter(r => r.status === "RETURNED");
@@ -200,6 +202,34 @@ const MyOrders = () => {
                           >
                             <MessageSquare className="h-4 w-4" /> Leave Review
                           </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Condition Verification Log */}
+                    <div className="border-t border-border/50 pt-4 mt-4">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-xs font-medium flex items-center gap-2"
+                        onClick={() => setExpandedConditionLog(expandedConditionLog === rental.id ? null : rental.id)}
+                      >
+                        {expandedConditionLog === rental.id ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                        Condition Verification Details
+                      </Button>
+
+                      {expandedConditionLog === rental.id && (
+                        <div className="mt-4">
+                          <ConditionLog
+                            pickupCondition={rental.pickupCondition}
+                            returnCondition={rental.returnCondition}
+                            depositDeductionPercent={rental.depositDeduction?.percentage}
+                            depositAmount={rental.amountDeposited}
+                          />
                         </div>
                       )}
                     </div>
