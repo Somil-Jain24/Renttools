@@ -192,6 +192,38 @@ export interface SellerListing {
   bookings: number;
 }
 
+export type ConnectionLevel = "1st" | "2nd" | "3rd" | "none";
+
+export interface UserConnection {
+  userId: string;
+  targetUserId: string;
+  level: ConnectionLevel;
+  connectedVia?: string[]; // Array of user names/ids for 2nd and 3rd connections
+  connectedAt: string;
+}
+
+export interface FollowedUser {
+  userId: string;
+  followedUserId: string;
+  followedAt: string;
+}
+
+// User connections data - tracking 1st, 2nd, 3rd degree connections
+export const userConnections: UserConnection[] = [
+  // Current user (current-user) connections
+  { userId: "current-user", targetUserId: "u1", level: "1st", connectedAt: "2026-01-15" }, // 1st degree connection
+  { userId: "current-user", targetUserId: "u2", level: "2nd", connectedVia: ["u1"], connectedAt: "2026-02-10" }, // 2nd degree via u1
+  { userId: "current-user", targetUserId: "u3", level: "3rd", connectedVia: ["u1", "u2"], connectedAt: "2026-03-05" }, // 3rd degree via u1 and u2
+  { userId: "current-user", targetUserId: "u4", level: "none", connectedAt: "2026-04-01" }, // Out of network
+];
+
+// User follows - who the current user is following
+export const followedUsers: FollowedUser[] = [
+  { userId: "current-user", followedUserId: "u1", followedAt: "2026-01-20" },
+  { userId: "current-user", followedUserId: "u2", followedAt: "2026-02-15" },
+  { userId: "current-user", followedUserId: "u4", followedAt: "2026-03-10" },
+];
+
 export const categories = [
   {
     name: "Power Tools", icon: "⚡",

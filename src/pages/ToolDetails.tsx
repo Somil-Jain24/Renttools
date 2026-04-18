@@ -4,11 +4,12 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { TrustBadge } from "@/components/TrustBadge";
 import { StarRating } from "@/components/StarRating";
+import { ConnectionBadge } from "@/components/ConnectionBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { tools, negotiatedOffers } from "@/lib/mockData";
-import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle, AlertCircle, Edit2, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { tools, negotiatedOffers, userConnections, followedUsers, wishlistItems } from "@/lib/mockData";
+import { MapPin, User, Shield, ArrowLeft, FileText, Download, Zap, CheckCircle, AlertCircle, Edit2, Star, ChevronLeft, ChevronRight, Heart, Plus } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { createOffer } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -30,9 +31,26 @@ const ToolDetails = () => {
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [demoRequestMessage, setDemoRequestMessage] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(
+    currentUser && tool ? followedUsers.some(f => f.userId === currentUser.id && f.followedUserId === tool.owner.id) : false
+  );
+  const [isWishlisted, setIsWishlisted] = useState(
+    currentUser && tool ? wishlistItems.some(w => w.userId === currentUser.id && w.toolId === tool.id) : false
+  );
 
   // Check if current user is the owner of this tool
   const isOwner = currentUser && tool && currentUser.id === tool.owner.id;
+
+  // Get connection level for the seller
+  const getSellerConnection = () => {
+    if (!currentUser || !tool) return { level: "none" as const, connectedVia: [] };
+    const connection = userConnections.find(
+      c => c.userId === currentUser.id && c.targetUserId === tool.owner.id
+    );
+    return connection || { level: "none" as const, connectedVia: [] };
+  };
+
+  const sellerConnection = getSellerConnection();
 
   if (!tool) {
     return (
@@ -131,6 +149,36 @@ const ToolDetails = () => {
     toast({ title: "Success", description: "Demo request sent to the owner!" });
   };
 
+  const handleFollowToggle = () => {
+    if (!currentUser || !tool) {
+      navigate("/signup");
+      return;
+    }
+
+    if (isFollowing) {
+      setIsFollowing(false);
+      toast({ title: "Unfollowed", description: `You unfollowed ${tool.owner.name}` });
+    } else {
+      setIsFollowing(true);
+      toast({ title: "Followed", description: `You're now following ${tool.owner.name}` });
+    }
+  };
+
+  const handleWishlistToggle = () => {
+    if (!currentUser || !tool) {
+      navigate("/signup");
+      return;
+    }
+
+    if (isWishlisted) {
+      setIsWishlisted(false);
+      toast({ title: "Removed", description: "Tool removed from wishlist" });
+    } else {
+      setIsWishlisted(true);
+      toast({ title: "Added", description: "Tool added to wishlist" });
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -195,17 +243,35 @@ const ToolDetails = () => {
             {/* Owner Section */}
             <div className="rounded-xl border bg-card p-4 space-y-3">
               <h3 className="text-sm font-semibold">Owner</h3>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm">{tool.owner.name}</p>
-                  <div className="flex items-center gap-2">
-                    <StarRating score={tool.owner.trustScore} showScore />
-                    <span className="text-xs text-muted-foreground">{tool.owner.trustScore}/100</span>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted flex-shrink-0">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-medium text-sm">{tool.owner.name}</p>
+                      {sellerConnection && sellerConnection.level !== "none" && (
+                        <ConnectionBadge level={sellerConnection.level} connectedVia={sellerConnection.connectedVia} />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <StarRating score={tool.owner.trustScore} showScore />
+                      <span className="text-xs text-muted-foreground">{tool.owner.trustScore}/100</span>
+                    </div>
                   </div>
                 </div>
+                {currentUser && !isOwner && currentUser.mode === "buyer" && (
+                  <Button
+                    variant={isFollowing ? "default" : "outline"}
+                    size="sm"
+                    className="h-8 text-xs flex-shrink-0"
+                    onClick={handleFollowToggle}
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    {isFollowing ? "Following" : "Follow"}
+                  </Button>
+                )}
               </div>
               <div className="flex flex-wrap gap-2">
                 <TrustBadge score={tool.owner.trustScore} showScore />
@@ -275,9 +341,22 @@ const ToolDetails = () => {
 
             {/* Rental section */}
             <div className="rounded-xl border bg-card p-4 space-y-4">
-              <h3 className="text-sm font-semibold">
-                {isOwner ? "Manage Listing" : "Rent this tool"}
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold">
+                  {isOwner ? "Manage Listing" : "Rent this tool"}
+                </h3>
+                {currentUser && currentUser.mode === "buyer" && !isOwner && (
+                  <Button
+                    variant={isWishlisted ? "default" : "outline"}
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={handleWishlistToggle}
+                  >
+                    <Heart className={`h-3.5 w-3.5 mr-1 ${isWishlisted ? "fill-current" : ""}`} />
+                    {isWishlisted ? "Wishlisted" : "Wishlist"}
+                  </Button>
+                )}
+              </div>
 
               {/* Date Selection - Only for Buyer Mode */}
               {currentUser && currentUser.mode === "buyer" && !isOwner && (
@@ -504,6 +583,61 @@ const ToolDetails = () => {
                 </div>
               </div>
             )}
+
+            {/* Recommendations Section */}
+            {(() => {
+              const similarTools = tools.filter(
+                t => t.category === tool.category && t.id !== tool.id
+              ).slice(0, 5);
+
+              if (similarTools.length === 0) return null;
+
+              return (
+                <div className="rounded-xl border bg-card p-4 space-y-4">
+                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                    🔗 Similar Products
+                  </h3>
+                  <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    {similarTools.map((similarTool) => (
+                      <Link
+                        key={similarTool.id}
+                        to={`/tools/${similarTool.id}`}
+                        className="block rounded-lg border border-border/60 bg-secondary/30 hover:bg-secondary/60 transition-colors p-3 space-y-2 group"
+                      >
+                        <div className="flex gap-3">
+                          <div className="h-20 w-20 rounded-lg bg-muted overflow-hidden flex-shrink-0">
+                            <img
+                              src={similarTool.images[0]}
+                              alt={similarTool.name}
+                              className="h-full w-full object-cover group-hover:scale-110 transition-transform"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                              {similarTool.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground line-clamp-2">
+                              {similarTool.description}
+                            </p>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-sm font-semibold text-primary">
+                                ₹{similarTool.pricePerDay}/day
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <StarRating score={similarTool.owner.trustScore} showScore={false} />
+                                <span className="text-xs text-muted-foreground">
+                                  {similarTool.distance} km
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
