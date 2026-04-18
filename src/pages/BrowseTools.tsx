@@ -3,28 +3,53 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToolCard } from "@/components/ToolCard";
 import { RentalRequestModal } from "@/components/RentalRequestModal";
-import { tools, categories } from "@/lib/mockData";
+import { tools, categories, userConnections } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Filter, X, SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/context/UserContext";
 import type { Tool } from "@/lib/mockData";
 
 const BrowseTools = () => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
   const { toast } = useToast();
+  const { currentUser } = useUser();
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [maxDistance, setMaxDistance] = useState(10);
   const [availableOnly, setAvailableOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<"nearest" | "cheapest">("nearest");
+  const [sortBy, setSortBy] = useState<"nearest" | "cheapest" | "connections">("connections");
   const [showFilters, setShowFilters] = useState(false);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [selectedToolForRequest, setSelectedToolForRequest] = useState<Tool | null>(null);
+
+  // Helper function to get connection level with a seller
+  const getConnectionLevel = (sellerId: string) => {
+    if (!currentUser) return "none";
+    const connection = userConnections.find(
+      c => c.userId === currentUser.id && c.targetUserId === sellerId
+    );
+    return connection?.level || "none";
+  };
+
+  // Helper function to get connection priority for sorting
+  const getConnectionPriority = (level: string) => {
+    switch (level) {
+      case "1st":
+        return 0;
+      case "2nd":
+        return 1;
+      case "3rd":
+        return 2;
+      default:
+        return 3;
+    }
+  };
 
   const filtered = useMemo(() => {
     let result = [...tools];
@@ -32,9 +57,28 @@ const BrowseTools = () => {
     result = result.filter(t => t.pricePerDay >= priceRange[0] && t.pricePerDay <= priceRange[1]);
     result = result.filter(t => t.distance <= maxDistance);
     if (availableOnly) result = result.filter(t => t.available);
-    result.sort((a, b) => sortBy === "nearest" ? a.distance - b.distance : a.pricePerDay - b.pricePerDay);
+
+    // Sort based on connections first, then by selected sort criteria
+    result.sort((a, b) => {
+      if (sortBy === "connections") {
+        const levelA = getConnectionLevel(a.owner.id);
+        const levelB = getConnectionLevel(b.owner.id);
+        const priorityA = getConnectionPriority(levelA);
+        const priorityB = getConnectionPriority(levelB);
+
+        if (priorityA !== priorityB) {
+          return priorityA - priorityB;
+        }
+        // Within same connection level, sort by distance
+        return a.distance - b.distance;
+      } else if (sortBy === "nearest") {
+        return a.distance - b.distance;
+      } else {
+        return a.pricePerDay - b.pricePerDay;
+      }
+    });
     return result;
-  }, [selectedCategory, priceRange, maxDistance, availableOnly, sortBy]);
+  }, [selectedCategory, priceRange, maxDistance, availableOnly, sortBy, currentUser]);
 
   const handleRequestRental = (tool: Tool) => {
     setSelectedToolForRequest(tool);
@@ -121,6 +165,9 @@ const BrowseTools = () => {
           </div>
           <div className="flex items-center gap-2">
             <div className="hidden sm:flex items-center bg-secondary/80 rounded-xl p-1 border border-border/60">
+              {currentUser && (
+                <Button variant={sortBy === "connections" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("connections")} className={`rounded-lg text-xs ${sortBy === "connections" ? "bg-card shadow-soft" : ""}`}>Your Network</Button>
+              )}
               <Button variant={sortBy === "nearest" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("nearest")} className={`rounded-lg text-xs ${sortBy === "nearest" ? "bg-card shadow-soft" : ""}`}>Nearest</Button>
               <Button variant={sortBy === "cheapest" ? "default" : "ghost"} size="sm" onClick={() => setSortBy("cheapest")} className={`rounded-lg text-xs ${sortBy === "cheapest" ? "bg-card shadow-soft" : ""}`}>Cheapest</Button>
             </div>

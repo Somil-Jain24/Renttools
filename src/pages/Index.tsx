@@ -1,8 +1,9 @@
-import { Search, MapPin, ArrowRight, Zap, DollarSign, TrendingUp, Users } from "lucide-react";
+import { MapPin, ArrowRight, Zap, DollarSign, TrendingUp, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToolCard } from "@/components/ToolCard";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { SearchAutocomplete } from "@/components/SearchAutocomplete";
 import { tools, categories } from "@/lib/mockData";
 import { Link } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
@@ -57,13 +58,9 @@ const Index = () => {
                   <MapPin className="h-4 w-4 text-primary shrink-0" />
                   <input placeholder="Your location" className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
                 </div>
-                <div className="flex flex-1 items-center gap-2.5 rounded-xl bg-secondary/70 px-4 py-3.5 transition-colors focus-within:bg-secondary">
-                  <Search className="h-4 w-4 text-primary shrink-0" />
-                  <input placeholder="Drill, ladder, saw..." className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+                <div className="flex-1">
+                  <SearchAutocomplete />
                 </div>
-                <Link to="/browse">
-                  <Button className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-primary to-success text-primary-foreground shadow-glow hover:shadow-card-hover transition-all duration-200 hover:scale-[1.02] rounded-xl">Search</Button>
-                </Link>
               </div>
 
               <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground flex-wrap">
