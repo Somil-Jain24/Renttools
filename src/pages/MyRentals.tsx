@@ -5,10 +5,11 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, AlertCircle, CheckCircle, MessageSquare, Eye, Zap, RotateCcw } from "lucide-react";
+import { Clock, AlertCircle, CheckCircle, MessageSquare, Eye, Zap, RotateCcw, Lock } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { myRentals, Rental } from "@/lib/mockData";
+import { myRentals, Rental, ConditionRecord } from "@/lib/mockData";
 import { ExtendRentalDialog } from "@/components/ExtendRentalDialog";
+import { PickupConditionCheck } from "@/components/PickupConditionCheck";
 
 const MyRentals = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const MyRentals = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | "REQUESTED" | "APPROVED" | "BORROWED">("all");
   const [extendDialogOpen, setExtendDialogOpen] = useState(false);
   const [selectedRentalForExtend, setSelectedRentalForExtend] = useState<Rental | null>(null);
+  const [pickupCheckDialogOpen, setPickupCheckDialogOpen] = useState(false);
+  const [selectedRentalForPickup, setSelectedRentalForPickup] = useState<Rental | null>(null);
 
   // Filter for active and upcoming rentals only (exclude RETURNED)
   const activeRentals = myRentals.filter(r => r.status !== "RETURNED");
@@ -63,6 +66,17 @@ const MyRentals = () => {
         return "Pending Approval";
       default:
         return status;
+    }
+  };
+
+  const handlePickupConditionSubmit = (conditionRecord: ConditionRecord) => {
+    if (selectedRentalForPickup) {
+      selectedRentalForPickup.pickupCondition = conditionRecord;
+      selectedRentalForPickup.pickupConditionPending = false;
+      selectedRentalForPickup.status = "BORROWED";
+      alert("✓ Pickup condition verified! Item is now marked as borrowed.");
+      setPickupCheckDialogOpen(false);
+      setSelectedRentalForPickup(null);
     }
   };
 
@@ -240,6 +254,19 @@ const MyRentals = () => {
                             <MessageSquare className="h-4 w-4" /> Chat with Owner
                           </Button>
                         )}
+                        {rental.status === "APPROVED" && (
+                          <Button
+                            size="sm"
+                            variant="default"
+                            className="w-full flex items-center gap-2"
+                            onClick={() => {
+                              setSelectedRentalForPickup(rental);
+                              setPickupCheckDialogOpen(true);
+                            }}
+                          >
+                            <Lock className="h-4 w-4" /> Confirm Pickup
+                          </Button>
+                        )}
                         {rental.status === "BORROWED" && (
                           <>
                             <Button
@@ -305,6 +332,20 @@ const MyRentals = () => {
           onExtend={(newEndDate) => {
             alert(`Rental extended to ${newEndDate}`);
             setExtendDialogOpen(false);
+          }}
+        />
+      )}
+
+      {/* Pickup Condition Check Dialog */}
+      {selectedRentalForPickup && pickupCheckDialogOpen && (
+        <PickupConditionCheck
+          rentalId={selectedRentalForPickup.id}
+          borrowerName={currentUser?.name || "Borrower"}
+          toolName={selectedRentalForPickup.tool.name}
+          onSubmit={handlePickupConditionSubmit}
+          onCancel={() => {
+            setPickupCheckDialogOpen(false);
+            setSelectedRentalForPickup(null);
           }}
         />
       )}

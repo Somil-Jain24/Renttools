@@ -47,6 +47,24 @@ export type TrustLevel = "basic" | "verified" | "trusted";
 export type OfferStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED" | "CONFIRMED";
 export type RequestStatus = "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED";
 export type TransactionStatus = "PENDING" | "PAID" | "FAILED";
+export type ConditionStatus = "GOOD" | "DAMAGED";
+
+export interface ConditionRecord {
+  status: ConditionStatus;
+  damageLevel?: DamageLevel;
+  description?: string;
+  images: string[]; // base64 or file URLs
+  timestamp: string;
+  recordedBy: string; // user id who recorded this condition
+  recordedByName: string;
+}
+
+export interface DepositDeduction {
+  percentage: number;
+  reason?: string;
+  recordedAt: string;
+  recordedBy: string; // owner id
+}
 
 export interface RentalRating {
   id: string;
@@ -76,6 +94,13 @@ export interface Rental {
   amountDeposited?: number;
   borrower?: ToolOwner;
   chatMessages?: ChatMessage[];
+  // Condition verification fields
+  pickupCondition?: ConditionRecord;
+  pickupConditionPending?: boolean; // true if buyer hasn't verified pickup condition yet
+  returnCondition?: ConditionRecord;
+  returnConditionPending?: boolean; // true if owner hasn't verified return condition yet
+  depositDeduction?: DepositDeduction;
+  depositRefundAmount?: number; // calculated amount to be refunded after deductions
 }
 
 export interface NegotiatedOffer {

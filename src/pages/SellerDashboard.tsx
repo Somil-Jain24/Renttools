@@ -1,14 +1,32 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
-import { ShoppingBag, Bell, Star, AlertCircle, CheckCircle, ArrowRight } from "lucide-react";
+import { ShoppingBag, Bell, Star, AlertCircle, CheckCircle, ArrowRight, Eye } from "lucide-react";
+import { ReturnConditionCheck } from "@/components/ReturnConditionCheck";
+import type { ConditionRecord, DepositDeduction } from "@/lib/mockData";
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
   const { currentUser } = useUser();
+  const [returnCheckDialogOpen, setReturnCheckDialogOpen] = useState(false);
+  const [selectedRentalForReturn, setSelectedRentalForReturn] = useState<any>(null);
+
+  const handleReturnConditionSubmit = (conditionRecord: ConditionRecord, deduction: DepositDeduction) => {
+    if (selectedRentalForReturn) {
+      selectedRentalForReturn.returnCondition = conditionRecord;
+      selectedRentalForReturn.returnConditionPending = false;
+      selectedRentalForReturn.depositDeduction = deduction;
+      const depositAmount = 5000; // Mock value - would come from rental
+      selectedRentalForReturn.depositRefundAmount = depositAmount - Math.round((deduction.percentage / 100) * depositAmount);
+      alert(`✓ Return verified! Deposit refund: ₹${selectedRentalForReturn.depositRefundAmount}`);
+      setReturnCheckDialogOpen(false);
+      setSelectedRentalForReturn(null);
+    }
+  };
 
   // Mock data for seller
   const myListings = [
@@ -134,14 +152,30 @@ const SellerDashboard = () => {
                       <p className="text-xs text-muted-foreground mb-2">Rented by: <span className="font-medium text-foreground">{rental.buyerName}</span></p>
                       <p className="text-xs text-muted-foreground">Rental Period: {rental.rentalStartDate} → {rental.expectedReturnDate}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-success">{rental.daysLeft}</p>
-                        <p className="text-xs text-muted-foreground">days left</p>
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-success">{rental.daysLeft}</p>
+                          <p className="text-xs text-muted-foreground">days left</p>
+                        </div>
+                        <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 text-xs font-medium">
+                          {rental.status}
+                        </div>
                       </div>
-                      <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 text-xs font-medium">
-                        {rental.status}
-                      </div>
+                      {rental.status === "Active" && rental.daysLeft === 0 && (
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          className="text-xs h-7"
+                          onClick={() => {
+                            setSelectedRentalForReturn(rental);
+                            setReturnCheckDialogOpen(true);
+                          }}
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          Verify Return
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -301,6 +335,22 @@ const SellerDashboard = () => {
       </div>
 
       <Footer />
+
+      {/* Return Condition Check Dialog */}
+      {selectedRentalForReturn && returnCheckDialogOpen && (
+        <ReturnConditionCheck
+          rentalId={selectedRentalForReturn.id}
+          ownerName={currentUser?.name || "Owner"}
+          borrowerName={selectedRentalForReturn.buyerName}
+          toolName={selectedRentalForReturn.toolName}
+          depositAmount={5000} // Mock value - would come from rental data
+          onSubmit={handleReturnConditionSubmit}
+          onCancel={() => {
+            setReturnCheckDialogOpen(false);
+            setSelectedRentalForReturn(null);
+          }}
+        />
+      )}
     </div>
   );
 };

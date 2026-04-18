@@ -194,8 +194,8 @@ const Earnings = () => {
                       <th className="text-left py-3 px-3 font-semibold text-muted-foreground">Date</th>
                       <th className="text-left py-3 px-3 font-semibold text-muted-foreground">Tool</th>
                       <th className="text-left py-3 px-3 font-semibold text-muted-foreground">Period</th>
-                      <th className="text-right py-3 px-3 font-semibold text-muted-foreground">Amount</th>
-                      <th className="text-center py-3 px-3 font-semibold text-muted-foreground">Deposit</th>
+                      <th className="text-right py-3 px-3 font-semibold text-muted-foreground">Rental Amount</th>
+                      <th className="text-right py-3 px-3 font-semibold text-muted-foreground">Deposit Status</th>
                       <th className="text-center py-3 px-3 font-semibold text-muted-foreground">Status</th>
                     </tr>
                   </thead>
@@ -218,16 +218,23 @@ const Earnings = () => {
                             {transaction.rentalStartDate} to {transaction.rentalEndDate}
                           </td>
                           <td className="py-3 px-3 text-right font-semibold">₹{transaction.rentalAmount.toLocaleString()}</td>
-                          <td className="py-3 px-3 text-center text-sm">
-                            {transaction.depositRefunded ? (
-                              <span className="inline-flex items-center gap-1 text-green-600">
-                                <CheckCircle className="h-4 w-4" /> Refunded
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 text-orange-600">
-                                <Clock className="h-4 w-4" /> ₹{transaction.depositAmount}
-                              </span>
-                            )}
+                          <td className="py-3 px-3 text-right text-sm">
+                            <div className="space-y-1">
+                              {transaction.depositRefunded ? (
+                                <div className="inline-flex items-center gap-1 text-green-600">
+                                  <CheckCircle className="h-4 w-4" /> Full Refund
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <div className="text-orange-600 inline-flex items-center gap-1">
+                                    <Clock className="h-4 w-4" /> Pending
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    Deposit: ₹{transaction.depositAmount.toLocaleString()}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3 px-3 text-center">
                             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${statusColor}`}>
